@@ -1,0 +1,79 @@
+package com.example.demo.Usuario;
+
+import com.example.demo.Jwt.TokenService;
+import com.example.demo.Util.Util;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Service;
+
+import java.util.concurrent.ExecutionException;
+
+@Service
+public class UsuarioService {
+    @Autowired
+    private UsuarioRepository fRepository;
+
+    @Autowired
+    private PasswordEncoder fPasswordEncoder;
+
+    @Autowired
+    private TokenService fTokenService;
+
+    @Autowired
+    private AuthenticationManager fAuthenticationManager;
+
+    public ResponseEntity<?> cadastrar(UsuarioCadastroDTO mDto) {
+        if (!Util.validaTelefone(mDto.getCelular())){
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Número do celular inválido, verifique!");
+        }
+
+        if (!(Util.formatarCpf(mDto.getCpf()).length() < 11)){
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Cpf inválido, verifique!");
+        }
+
+        if (fRepository.findByEmail(mDto.getEmail()) != null){
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("E-mail já em uso, verifique!");
+        }
+
+        if (fRepository.findByCpf(mDto.getCpf()) != null){
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Cpf já em uso, verifique!");
+        }
+
+        UsuarioVO mUsuarioVO = new UsuarioVO();
+        mUsuarioVO.setCpf(Util.formatarCpf(mDto.getCpf()));
+        mUsuarioVO.setCelular(Util.formatarTelefone(mDto.getCelular()));
+        mUsuarioVO.setEmail(mDto.getEmail().toUpperCase());
+        mUsuarioVO.setNome(mDto.getNome().toUpperCase());
+
+        String mSenha = fPasswordEncoder.encode(mDto.getSenha());
+        mUsuarioVO.setSenha(mSenha);
+        try {
+            fRepository.save(mUsuarioVO);
+        } catch (Exception e){
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Falha ao cadastrar usuário\n" + e.getMessage());
+        }
+
+        return ResponseEntity.status(HttpStatus.OK).body("Usuário cadastrado com sucesso");
+    };
+
+    public ResponseEntity<?> login (String mEmail, String mSenha){
+        try {
+            if (fRepository.findByEmail(mEmail) == null){
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("E-mail ou senha incorreto!");
+            }
+
+            var mAuthToken = new UsernamePasswordAuthenticationToken(mEmail.toUpperCase(), mSenha);
+            var mAuth = fAuthenticationManager.authenticate(mAuthToken);
+
+            var mToken = fTokenService.generateToken((UsuarioVO) mAuth.getPrincipal());
+            return ResponseEntity.status(HttpStatus.OK).body("Login realizado com sucesso\n" + "Token: " + mToken);
+        } catch (Exception e){
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Erro: " + e.getClass().getSimpleName() + " - " + e.getMessage());
+        }
+    }
+}
