@@ -1,6 +1,7 @@
 package com.example.demo.Usuario;
 
 import com.example.demo.Jwt.TokenService;
+import com.example.demo.Util.ApiResponseUtil;
 import com.example.demo.Util.Util;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -28,19 +29,24 @@ public class UsuarioService {
 
     public ResponseEntity<?> cadastrar(UsuarioCadastroDTO mDto) {
         if (!Util.validaTelefone(mDto.getCelular())){
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Número do celular inválido, verifique!");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
+                    ApiResponseUtil.response("Erro", "Número do celular inválido, verifique!"));
         }
 
-        if (!(Util.formatarCpf(mDto.getCpf()).length() < 11)){
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Cpf inválido, verifique!");
+        if (Util.formatarCpf(mDto.getCpf()).length() < 11){
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
+                    ApiResponseUtil.response("Erro", "Cpf inválido, verifique!"));
         }
 
         if (fRepository.findByEmail(mDto.getEmail()) != null){
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("E-mail já em uso, verifique!");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
+                    ApiResponseUtil.response("Erro", "E-mail já em uso, verifique!"));
         }
 
-        if (fRepository.findByCpf(mDto.getCpf()) != null){
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Cpf já em uso, verifique!");
+
+        if (fRepository.findByCpf(Util.formatarCpf(mDto.getCpf())) != null){
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
+                    ApiResponseUtil.response("Erro","Cpf já em uso, verifique!"));
         }
 
         UsuarioVO mUsuarioVO = new UsuarioVO();
@@ -54,26 +60,34 @@ public class UsuarioService {
         try {
             fRepository.save(mUsuarioVO);
         } catch (Exception e){
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Falha ao cadastrar usuário\n" + e.getMessage());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
+                    ApiResponseUtil.response("Erro","Falha ao cadastrar usuário\n" + e.getMessage()));
         }
 
-        return ResponseEntity.status(HttpStatus.OK).body("Usuário cadastrado com sucesso");
+        return ResponseEntity.status(HttpStatus.OK).body(
+                ApiResponseUtil.response("Sucesso", "Usuário cadastrado com sucesso"));
     };
 
     public ResponseEntity<?> login (String mEmail, String mSenha){
         try {
-            if (fRepository.findByEmail(mEmail) == null){
-                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("E-mail ou senha incorreto!");
+            String mEmailUpper = mEmail.toUpperCase();
+            UsuarioVO mVO = fRepository.findByEmail(mEmailUpper);
+            if (fRepository.findByEmail(mEmailUpper) == null){
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(
+                        ApiResponseUtil.response("Erro","E-mail ou senha incorreto!"));
             }
 
-            var mAuthToken = new UsernamePasswordAuthenticationToken(mEmail.toUpperCase(), mSenha);
+            var mAuthToken = new UsernamePasswordAuthenticationToken(mEmailUpper, mSenha);
             var mAuth = fAuthenticationManager.authenticate(mAuthToken);
 
             var mToken = fTokenService.generateToken((UsuarioVO) mAuth.getPrincipal());
-            return ResponseEntity.status(HttpStatus.OK).body("Login realizado com sucesso\n" + "Token: " + mToken);
+            return ResponseEntity.status(HttpStatus.OK).body(
+                    ApiResponseUtil.response("Sucesso","Login realizado com sucesso\n" + "Token: " + mToken));
         } catch (Exception e){
             e.printStackTrace();
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Erro: " + e.getClass().getSimpleName() + " - " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(
+                    ApiResponseUtil.response("Erro","Erro: " + e.getClass().getSimpleName() + " - " + e.getMessage()));
         }
     }
+
 }

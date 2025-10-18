@@ -34,6 +34,7 @@ public class SecurityConfigurations {
                         .requestMatchers(HttpMethod.POST, "/usuario/recuperar-senha").permitAll()
                         .requestMatchers(HttpMethod.PUT, "/usuario/redefinir-senha").permitAll()
                         .requestMatchers(HttpMethod.POST, "/usuario/cadastrar").permitAll()
+                        .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                         .anyRequest().authenticated()
                 )
                 .addFilterBefore(securityFilter, UsernamePasswordAuthenticationFilter.class)

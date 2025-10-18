@@ -6,7 +6,7 @@ import java.text.ParseException;
 public abstract class Util {
     public static String formatarTelefone(String mNumero){
         try {
-            mNumero = mNumero.trim().replaceAll("[-/.()]", "");
+            mNumero = mNumero.replaceAll("[-/.()\\s]", "");
             MaskFormatter mMascara = new MaskFormatter("(##)#####-####");
             mMascara.setValueContainsLiteralCharacters(false);
 
