@@ -86,7 +86,7 @@ public class UsuarioService {
         } catch (Exception e){
             e.printStackTrace();
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(
-                    ApiResponseUtil.response("Erro", e.getMessage()));
+                    ApiResponseUtil.response("Erro",  e.getMessage()));
         }
     }
 
