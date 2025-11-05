@@ -11,6 +11,8 @@ public class WebConfig implements WebMvcConfigurer {
         registry.addMapping("/**")
                 .allowedOrigins(
                         "http://localhost:5174",
+                        "http://localhost:5173",
+                        "http://localhost:5175",
                         "'http://localhost:8080",
                         "http://192.168.18.22:5173",
                         "https://controle-financeiro-gilt.vercel.app")
