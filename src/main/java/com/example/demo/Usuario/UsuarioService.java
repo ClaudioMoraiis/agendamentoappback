@@ -1,6 +1,8 @@
 package com.example.demo.Usuario;
 
 import com.example.demo.Jwt.TokenService;
+import com.example.demo.UsuarioToken.UsuarioTokenRepository;
+import com.example.demo.UsuarioToken.UsuarioTokenVO;
 import com.example.demo.Util.ApiResponseUtil;
 import com.example.demo.Util.Util;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,6 +13,11 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.time.chrono.ChronoLocalDateTime;
+import java.util.Optional;
 import java.util.concurrent.ExecutionException;
 
 @Service
@@ -26,6 +33,9 @@ public class UsuarioService {
 
     @Autowired
     private AuthenticationManager fAuthenticationManager;
+
+    @Autowired
+    private UsuarioTokenRepository fUsuarioTokenRepository;
 
     public ResponseEntity<?> cadastrar(UsuarioCadastroDTO mDto) {
         if (!Util.validaTelefone(mDto.getCelular())){
@@ -88,6 +98,26 @@ public class UsuarioService {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(
                     ApiResponseUtil.response("Erro",  e.getMessage()));
         }
+    }
+
+    public ResponseEntity<?>BuscarPorUsuarioToken(String mToken){
+        Optional<UsuarioTokenVO> mUsuarioTokenVO = fUsuarioTokenRepository.findByToken(mToken);
+        if (mUsuarioTokenVO.isEmpty() || mUsuarioTokenVO == null){
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
+                ApiResponseUtil.response("Erro", "Token vazio ou não informado")
+            );
+        }
+
+        if (mUsuarioTokenVO.get().getUto_dthr_expiracao().isBefore(LocalDateTime.now())) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
+                    ApiResponseUtil.response("Erro", "Token expirou")
+            );
+
+        }
+
+        return ResponseEntity.status(HttpStatus.OK).body(
+                mUsuarioTokenVO.get().getUsuario().getId()
+        );
     }
 
 }
