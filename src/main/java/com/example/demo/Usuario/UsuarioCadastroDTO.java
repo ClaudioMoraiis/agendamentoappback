@@ -21,7 +21,7 @@ public class UsuarioCadastroDTO {
     private String cpf;
 
     @JsonProperty("senha")
-    @NotNull(message = "Informe o campo 'senha' no body")
+    @NotNull(groups = CriarUsuario.class, message = "Informe o campo 'senha' no body")
     private String senha;
 
     public UsuarioCadastroDTO(String nome, String email, String celular, String cpf, String senha) {
