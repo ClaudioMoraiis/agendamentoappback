@@ -107,6 +107,18 @@ public class UsuarioVO implements UserDetails {
         return result;
     }
 
+    @PrePersist
+    @PreUpdate
+    public void toUpperCase() {
+        if (nome != null) {
+            nome = nome.toUpperCase();
+        }
+
+        if (email != null) {
+            email = email.toUpperCase();
+        }
+    }
+
     @Override
     public String toString() {
         return "UsuarioVO{" +

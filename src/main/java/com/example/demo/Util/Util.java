@@ -19,7 +19,7 @@ public abstract class Util {
 
     public static Boolean validaTelefone(String mNumero){
         mNumero = mNumero.trim().replaceAll("[-/.()]", "");
-        if (mNumero.length() < 11){
+        if (mNumero.length() != 11){
             return false;
         }
 

@@ -6,8 +6,10 @@ import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Repository;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.Map;
 
 @RestController
@@ -20,7 +22,7 @@ public class UsuarioRota {
     private EmailService fEmailService;
 
     @PostMapping("/cadastrar")
-    public ResponseEntity<?> cadastrar (@Valid @RequestBody UsuarioCadastroDTO mDto){
+    public ResponseEntity<?> cadastrar (@Validated(CriarUsuario.class) @RequestBody UsuarioCadastroDTO mDto){
         return fService.cadastrar(mDto);
     }
 
@@ -43,4 +45,20 @@ public class UsuarioRota {
     public ResponseEntity<?>porUsuarioToken(@PathVariable String token){
         return fService.BuscarPorUsuarioToken(token);
     }
+
+    @GetMapping("/listar")
+    public List<Map<String, Object>>listar(){
+        return fService.listar();
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<?>alterar(@Validated(AlterarUsuario.class) @RequestBody UsuarioCadastroDTO mDTO, @PathVariable Long id){
+        return fService.alterar(mDTO, id);
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<?>deletar(@PathVariable Long id){
+        return fService.deletar(id);
+    }
+
 }
