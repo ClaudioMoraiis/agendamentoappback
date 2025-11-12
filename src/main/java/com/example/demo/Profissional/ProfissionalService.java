@@ -9,6 +9,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import java.util.Optional;
+
 @Service
 public class ProfissionalService {
     @Autowired
@@ -46,11 +48,24 @@ public class ProfissionalService {
             );
         }
 
+        if (!Util.validaTelefone(mDTO.getTelefone())){
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(
+                    ApiResponseUtil.response("Erro", "Telefone inválido!")
+            );
+        }
+
+        if (!mDTO.getStatus().toUpperCase().matches(".*(TRUE|FALSE).*")){
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(
+                    ApiResponseUtil.response("Erro", "No campo status informe TRUE ou FALSE!")
+            );
+        }
+
         return null;
     }
 
     public ResponseEntity<?>cadastrar(ProfissionalDTO mDTO){
-        EspecialidadeVO mEspecialidadeVO = fEspecialidadeRepository.findByNome(mDTO.getEspecialidade());
+        Optional<EspecialidadeVO> mEspecialidadeOpt = fEspecialidadeRepository.findById(mDTO.getEspecialidade());
+        EspecialidadeVO mEspecialidadeVO = mEspecialidadeOpt.get();
 
         ResponseEntity<?>mValidacao = validar(mDTO, mEspecialidadeVO);
         if (mValidacao != null){

@@ -1,6 +1,7 @@
 package com.example.demo.Profissional;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotNull;
 import org.springframework.format.annotation.NumberFormat;
 
@@ -17,17 +18,18 @@ public class ProfissionalDTO {
 
     @JsonProperty("especialidade")
     @NotNull(message = "Campo 'especialidade' não informado no body")
-    private String especialidade;
+    private Long especialidade;
 
     @JsonProperty("status")
     @NotNull(message = "Campo 'status' não informado no body")
     private String status;
 
     @JsonProperty("email")
+    @Email
     @NotNull(message = "Campo 'email' não informado no body")
     private String email;
 
-    public ProfissionalDTO(String nome, String telefone, String especialidade, String status, String email) {
+    public ProfissionalDTO(String nome, String telefone, Long especialidade, String status, String email) {
         this.nome = nome;
         this.telefone = telefone;
         this.especialidade = especialidade;
@@ -53,11 +55,11 @@ public class ProfissionalDTO {
         this.telefone = telefone;
     }
 
-    public String getEspecialidade() {
+    public Long getEspecialidade() {
         return especialidade;
     }
 
-    public void setEspecialidade(String especialidade) {
+    public void setEspecialidade(Long especialidade) {
         this.especialidade = especialidade;
     }
 
