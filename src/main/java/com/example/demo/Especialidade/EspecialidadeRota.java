@@ -5,6 +5,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/especialidade")
 public class EspecialidadeRota {
@@ -14,5 +16,10 @@ public class EspecialidadeRota {
     @PostMapping("/cadastrar")
     public ResponseEntity<?>cadastrar(@RequestBody @Valid EspecialidadeDTO mDTO){
         return fService.cadastrar(mDTO);
+    }
+
+    @GetMapping("/listar")
+    public List<EspecialidadeVO> list(){
+        return fService.list();
     }
 }

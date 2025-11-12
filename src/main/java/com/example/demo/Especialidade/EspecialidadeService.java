@@ -6,6 +6,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 public class EspecialidadeService {
     @Autowired
@@ -30,5 +32,9 @@ public class EspecialidadeService {
                     ApiResponseUtil.response("Erro", e.getMessage())
             );
         }
+    }
+
+    public List<EspecialidadeVO>list(){
+        return fRepository.findAll();
     }
 }

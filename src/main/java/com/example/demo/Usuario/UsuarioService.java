@@ -162,7 +162,6 @@ public class UsuarioService {
                 .toList();
     }
 
-
     public ResponseEntity<?>alterar(UsuarioCadastroDTO mDto, Long mId){
         Optional<UsuarioVO> mUsuarioVO = fRepository.findById(mId);
         UsuarioVO mUsuarioVoOld = new UsuarioVO();

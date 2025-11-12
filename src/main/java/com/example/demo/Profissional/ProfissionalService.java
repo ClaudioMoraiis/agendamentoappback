@@ -2,6 +2,7 @@ package com.example.demo.Profissional;
 
 import com.example.demo.Especialidade.EspecialidadeRepository;
 import com.example.demo.Especialidade.EspecialidadeVO;
+import com.example.demo.Usuario.UsuarioVO;
 import com.example.demo.Util.ApiResponseUtil;
 import com.example.demo.Util.Util;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,6 +10,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @Service
@@ -64,9 +68,7 @@ public class ProfissionalService {
     }
 
     public ResponseEntity<?>cadastrar(ProfissionalDTO mDTO){
-        Optional<EspecialidadeVO> mEspecialidadeOpt = fEspecialidadeRepository.findById(mDTO.getEspecialidade());
-        EspecialidadeVO mEspecialidadeVO = mEspecialidadeOpt.get();
-
+        EspecialidadeVO mEspecialidadeVO = fEspecialidadeRepository.findByNome(mDTO.getEspecialidade());
         ResponseEntity<?>mValidacao = validar(mDTO, mEspecialidadeVO);
         if (mValidacao != null){
             return mValidacao;
@@ -85,6 +87,21 @@ public class ProfissionalService {
                     ApiResponseUtil.response("Erro", e.getMessage())
             );
         }
+    }
 
+    public List<Map<String, Object>> list() {
+        List<ProfissionalVO> mProfissionalVO = fRepository.findAll();
+        return mProfissionalVO.stream()
+                .map(mVO -> {
+                    Map<String, Object> map = new HashMap<>();
+                    map.put("nome", mVO.getNome());
+                    map.put("email", mVO.getEmail());
+                    map.put("celular", mVO.getCelular());
+                    map.put("id", mVO.getId());
+                    map.put("especialidade", mVO.getEspecialidadeVO().getNome());
+                    map.put("status", mVO.getStatus());
+                    return map;
+                })
+                .toList();
     }
 }
