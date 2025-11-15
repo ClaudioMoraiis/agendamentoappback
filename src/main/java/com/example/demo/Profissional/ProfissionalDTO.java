@@ -13,27 +13,37 @@ public class ProfissionalDTO {
     private String nome;
 
     @JsonProperty("telefone")
-    @NotNull(message = "telefone 'email' não informado no body")
+    @NotNull(message = "Campo 'telefone' não informado no body")
     private String telefone;
 
     @JsonProperty("especialidade")
     @NotNull(message = "Campo 'especialidade' não informado no body")
-    private Long especialidade;
+    private String especialidade;
 
-    @JsonProperty("status")
-    @NotNull(message = "Campo 'status' não informado no body")
-    private String status;
+    @JsonProperty("ativo")
+    @NotNull(message = "Campo 'ativo' não informado no body")
+    private String ativo;
 
     @JsonProperty("email")
     @Email
     @NotNull(message = "Campo 'email' não informado no body")
     private String email;
 
-    public ProfissionalDTO(String nome, String telefone, Long especialidade, String status, String email) {
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    private Long id;
+
+    public ProfissionalDTO(String nome, String telefone, String especialidade, String ativo, String email) {
         this.nome = nome;
         this.telefone = telefone;
         this.especialidade = especialidade;
-        this.status = status;
+        this.ativo = ativo;
         this.email = email;
     }
 
@@ -55,20 +65,20 @@ public class ProfissionalDTO {
         this.telefone = telefone;
     }
 
-    public Long getEspecialidade() {
+    public String getEspecialidade() {
         return especialidade;
     }
 
-    public void setEspecialidade(Long especialidade) {
+    public void setEspecialidade(String especialidade) {
         this.especialidade = especialidade;
     }
 
     public String getStatus() {
-        return status;
+        return ativo;
     }
 
     public void setStatus(String status) {
-        this.status = status;
+        this.ativo = status;
     }
 
     public String getEmail() {
@@ -84,13 +94,13 @@ public class ProfissionalDTO {
         if (o == null || getClass() != o.getClass()) return false;
         ProfissionalDTO that = (ProfissionalDTO) o;
         return Objects.equals(nome, that.nome) && Objects.equals(telefone, that.telefone) &&
-               Objects.equals(especialidade, that.especialidade) && Objects.equals(status, that.status) &&
+               Objects.equals(especialidade, that.especialidade) && Objects.equals(ativo, that.ativo) &&
                Objects.equals(email, that.email) ;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(nome, telefone, especialidade, status, email);
+        return Objects.hash(nome, telefone, especialidade, ativo, email);
     }
 
     @Override
@@ -99,7 +109,7 @@ public class ProfissionalDTO {
                 "nome='" + nome + '\'' +
                 ", telefone='" + telefone + '\'' +
                 ", especialidade='" + especialidade + '\'' +
-                ", status='" + status + '\'' +
+                ", status='" + ativo + '\'' +
                 ", email='" + email + '\'' +
                 '}';
     }

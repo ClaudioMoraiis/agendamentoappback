@@ -23,24 +23,17 @@ public class ProfissionalService {
     @Autowired
     private EspecialidadeRepository fEspecialidadeRepository;
 
-    public ProfissionalVO converterDtoParaVO(ProfissionalDTO mDTO){
-        ProfissionalVO mProfissionalVO = new ProfissionalVO();
-        mProfissionalVO.setCelular(Util.formatarTelefone(mDTO.getTelefone()));
-        mProfissionalVO.setEmail(mDTO.getEmail());
-        mProfissionalVO.setStatus(mDTO.getStatus());
-        mProfissionalVO.setNome(mDTO.getNome());
+    public ProfissionalVO converterDtoParaVO(ProfissionalDTO mDTO, ProfissionalVO mVO){
+        mVO.setCelular(Util.formatarTelefone(mDTO.getTelefone()));
+        mVO.setEmail(mDTO.getEmail());
+        mVO.setStatus(mDTO.getStatus());
+        mVO.setNome(mDTO.getNome());
 
-        return mProfissionalVO;
+        return mVO;
     }
 
     public ResponseEntity<?>validar(ProfissionalDTO mDTO, EspecialidadeVO mEspecialidadeVO){
-        if (fRepository.findByCelular(Util.formatarTelefone(mDTO.getTelefone())) != null){
-            return ResponseEntity.status(HttpStatus.CONFLICT).body(
-                    ApiResponseUtil.response("Erro", "Já existe profissional com esse número de celular!")
-            );
-        }
-
-        if (fRepository.findByEmail(mDTO.getEmail()) != null){
+        if (fRepository.existsByEmailAndIdNot(mDTO.getEmail(), mDTO.getId())){
             return ResponseEntity.status(HttpStatus.CONFLICT).body(
                     ApiResponseUtil.response("Erro", "Já existe profissional com esse e-mail!")
             );
@@ -55,6 +48,12 @@ public class ProfissionalService {
         if (!Util.validaTelefone(mDTO.getTelefone())){
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(
                     ApiResponseUtil.response("Erro", "Telefone inválido!")
+            );
+        }
+
+        if (fRepository.existsByCelularAndIdNot(mDTO.getTelefone(), mDTO.getId())){
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(
+                    ApiResponseUtil.response("Erro", "Já existe profissional com esse número de celular!")
             );
         }
 
@@ -75,7 +74,8 @@ public class ProfissionalService {
         }
 
         try {
-            ProfissionalVO mProfissionalVO = converterDtoParaVO(mDTO);
+            ProfissionalVO mProfissionalVO = new ProfissionalVO();
+            mProfissionalVO = converterDtoParaVO(mDTO, mProfissionalVO);
             mProfissionalVO.setEspecialidadeVO(mEspecialidadeVO);
             fRepository.save(mProfissionalVO);
 
@@ -96,12 +96,63 @@ public class ProfissionalService {
                     Map<String, Object> map = new HashMap<>();
                     map.put("nome", mVO.getNome());
                     map.put("email", mVO.getEmail());
-                    map.put("celular", mVO.getCelular());
+                    map.put("telefone", mVO.getCelular());
                     map.put("id", mVO.getId());
                     map.put("especialidade", mVO.getEspecialidadeVO().getNome());
                     map.put("status", mVO.getStatus());
                     return map;
                 })
                 .toList();
+    }
+
+    public ResponseEntity<?>update(Long mId, ProfissionalDTO mDTO){
+        Optional<ProfissionalVO> mProfissionalOpt = fRepository.findById(mId);
+        if (mProfissionalOpt.isEmpty() || mProfissionalOpt == null){
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(
+                    ApiResponseUtil.response("Erro", "Nenhum profissional localizado com esse id!")
+            );
+        }
+
+        EspecialidadeVO mEspecialidadeVO = fEspecialidadeRepository.findByNome(mDTO.getEspecialidade());
+        mDTO.setId(mId);
+
+        ResponseEntity<?>mValidacao = validar(mDTO, mEspecialidadeVO);
+        if (mValidacao != null){
+            return mValidacao;
+        }
+
+        try {
+            ProfissionalVO mProfissionalVO = converterDtoParaVO(mDTO, mProfissionalOpt.get());
+            mProfissionalVO.setEspecialidadeVO(mEspecialidadeVO);
+            fRepository.save(mProfissionalVO);
+            return ResponseEntity.status(HttpStatus.OK).body(
+                    ApiResponseUtil.response("Sucesso", "Registro alterado com sucesso")
+            );
+        }catch (Exception e){
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
+                    ApiResponseUtil.response("Erro", e.getMessage())
+            );
+        }
+
+    }
+
+    public ResponseEntity<?>delete(Long mId){
+        Optional<ProfissionalVO> mProfissionalVO = fRepository.findById(mId);
+        if (mProfissionalVO.isEmpty()){
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(
+                    ApiResponseUtil.response("Erro", "Não existe profissional com esse id!")
+            );
+        }
+
+        try {
+            fRepository.delete(mProfissionalVO.get());
+            return ResponseEntity.status(HttpStatus.OK).body(
+                    ApiResponseUtil.response("Sucesso", "Registro excluido com sucesso!")
+            );
+        }catch (Exception e){
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(
+                    ApiResponseUtil.response("Erro", "Não existe profissional com esse id!")
+            );
+        }
     }
 }

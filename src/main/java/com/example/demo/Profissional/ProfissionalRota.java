@@ -23,6 +23,16 @@ public class ProfissionalRota {
     public List<Map<String, Object>> list(){
         return fService.list();
     }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<?>update(@PathVariable Long id, @RequestBody @Valid ProfissionalDTO mDTO){
+        return fService.update(id, mDTO);
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<?>delete(@PathVariable Long id){
+        return fService.delete(id);
+    }
 }
 
 
