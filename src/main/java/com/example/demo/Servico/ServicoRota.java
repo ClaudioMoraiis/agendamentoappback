@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 @RestController
@@ -31,5 +32,10 @@ public class ServicoRota {
     @DeleteMapping("/{id}")
     public ResponseEntity<?>deletar(@PathVariable Long id){
         return fService.excluir(id);
+    }
+
+    @GetMapping("/id")
+    public ResponseEntity<?>idByNameAndPrice(@RequestParam String name, @RequestParam BigDecimal price){
+        return fService.getIdByNameAndPrice(name, price);
     }
 }
