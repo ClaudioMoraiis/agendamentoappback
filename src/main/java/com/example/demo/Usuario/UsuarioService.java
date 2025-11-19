@@ -75,6 +75,11 @@ public class UsuarioService {
                     ApiResponseUtil.response("Erro", "E-mail não informado!"));
         }
 
+        if (fRepository.findByNome(mDto.getNome().toUpperCase()) != null){
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
+                    ApiResponseUtil.response("Erro", "Já existe cliente com esse nome!"));
+        }
+
         return null;
     }
 
@@ -208,6 +213,17 @@ public class UsuarioService {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
                     ApiResponseUtil.response("Erro", e.getMessage()));
         }
+    }
+
+    public ResponseEntity<?>getIdByName(String mName){
+        UsuarioVO mUserVO = fRepository.findByNome(mName.toUpperCase());
+        if (mUserVO == null){
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(
+                    ApiResponseUtil.response("Erro", "Nenhum cliente localizado com esse nome"));
+        }
+
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
+                ApiResponseUtil.response("Sucesso", mUserVO.getId().toString()));
     }
 
 }

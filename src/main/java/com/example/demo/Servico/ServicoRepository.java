@@ -13,4 +13,6 @@ import java.math.BigDecimal;
 public interface ServicoRepository extends JpaRepository<ServicoVO, Long> {
     @Query("SELECT s FROM ServicoVO s WHERE (s.nome = :mNome) AND (s.valor = :mValor)")
     ServicoVO getServico(@Param("mNome") String mNome, @Param("mValor")BigDecimal mValor);
+    ServicoVO findByNome(String mNome);
+    ServicoVO findByNomeAndValor(String mName, BigDecimal mPrice);
 }

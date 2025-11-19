@@ -9,4 +9,5 @@ public interface UsuarioRepository extends JpaRepository<UsuarioVO, Long> {
     UsuarioVO findByCpf(String mCpf);
     boolean existsByEmailAndIdNot(String email, Long id);
     boolean existsByCpfAndIdNot(String email, Long id);
+    UsuarioVO findByNome(String mNome);
 }

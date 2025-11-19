@@ -63,6 +63,12 @@ public class ProfissionalService {
             );
         }
 
+        if (fRepository.findFirstByNome(mDTO.getNome()) != null){
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(
+                    ApiResponseUtil.response("Erro", "Já existe profissional com esse nome!")
+            );
+        }
+
         return null;
     }
 
@@ -154,5 +160,18 @@ public class ProfissionalService {
                     ApiResponseUtil.response("Erro", "Não existe profissional com esse id!")
             );
         }
+    }
+
+    public ResponseEntity<?>getIdByNome(String mNome){
+        ProfissionalVO mProfissionalVO = fRepository.findByNome(mNome.toUpperCase());
+        if (mProfissionalVO == null){
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(
+                    ApiResponseUtil.response("Erro", "Não existe profissional com esse nome!")
+            );
+        }
+
+        return ResponseEntity.status(HttpStatus.OK).body(
+                ApiResponseUtil.response("Sucesso", mProfissionalVO.getId().toString())
+        );
     }
 }

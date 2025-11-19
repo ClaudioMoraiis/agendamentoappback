@@ -1,10 +1,11 @@
-package com.example.demo.Jwt;
+package com.example.demo.ExceptionHandler;
 
 import com.example.demo.Util.ApiResponseUtil;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
@@ -30,4 +31,17 @@ public class ValidationHandler {
                 .body(
                         ApiResponseUtil.response("Erro", "Corpo da requisição vazio ou inválido\n" + e.getMessage()));
     }
+
+    @ExceptionHandler(MissingServletRequestParameterException.class)
+    public ResponseEntity<Map<String, String>> handleMissingParams(MissingServletRequestParameterException ex) {
+
+        String paramName = ex.getParameterName();
+
+        Map<String, String> body = new HashMap<>();
+        body.put("erro", "Parâmetro obrigatório não enviado");
+        body.put("parametro", paramName);
+
+        return ResponseEntity.badRequest().body(body);
+    }
+
 }

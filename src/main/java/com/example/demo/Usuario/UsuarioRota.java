@@ -61,4 +61,9 @@ public class UsuarioRota {
         return fService.deletar(id);
     }
 
+    @GetMapping("/id/{name}")
+    public ResponseEntity<?>idByName(@PathVariable String name){
+        return fService.getIdByName(name);
+    }
+
 }

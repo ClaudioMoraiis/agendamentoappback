@@ -6,6 +6,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -97,7 +98,7 @@ public class ServicoService {
             fRepository.delete(mServicoVO.get());
             return ResponseEntity.status(HttpStatus.OK).body(
                     ApiResponseUtil.response(
-                            "Erro", "Serviço excluido com sucesso!"
+                            "Sucesso", "Serviço excluido com sucesso!"
                     )
             );
         } catch (Exception e) {
@@ -107,6 +108,23 @@ public class ServicoService {
                     )
             );
         }
+    }
+
+    public ResponseEntity<?> getIdByNameAndPrice(String mName, BigDecimal mPrice) {
+        ServicoVO mServiceVO = fRepository.findByNomeAndValor(mName.toUpperCase(), mPrice);
+        if (mServiceVO == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(
+                    ApiResponseUtil.response(
+                            "Erro", "Nenhum serviço localizado!"
+                    )
+            );
+        }
+
+        return ResponseEntity.status(HttpStatus.OK).body(
+                ApiResponseUtil.response(
+                        "Sucesso", mServiceVO.getId().toString()
+                )
+        );
     }
 
     //Todo: Criar um método para validar as requisições, está ficando muita validação nas rotas

@@ -9,4 +9,6 @@ public interface ProfissionalRepository extends JpaRepository<ProfissionalVO, Lo
     boolean existsByCelularAndIdNot(String mCelular, Long id);
     ProfissionalVO findByCelular(String mCelular);
     ProfissionalVO findByEmail(String mEmail);
+    ProfissionalVO findByNome(String mNome);
+    ProfissionalVO findFirstByNome(String mNome);
 }

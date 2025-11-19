@@ -5,6 +5,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
 
@@ -32,6 +33,11 @@ public class ProfissionalRota {
     @DeleteMapping("/{id}")
     public ResponseEntity<?>delete(@PathVariable Long id){
         return fService.delete(id);
+    }
+
+    @GetMapping("/{nome}")
+    public ResponseEntity<?>idByNome(@PathVariable String nome){
+        return fService.getIdByNome(nome);
     }
 }
 
