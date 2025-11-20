@@ -20,7 +20,7 @@ public class AgendamentoVO {
     private Long id;
 
     @ManyToOne
-    @JoinColumn(name = "age_usu_id", referencedColumnName = "usu_id", nullable = false)
+    @JoinColumn(name = "age_usu_id", referencedColumnName = "usu_id", nullable = true)
     private UsuarioVO usuarioVO;
 
     @Column(name = "age_usu_nome")
@@ -53,9 +53,12 @@ public class AgendamentoVO {
     @Enumerated(EnumType.STRING)
     private EnumAgendamentoStatus status;
 
+    @Column(name = "agen_usu_cadastrado")
+    private String usuarioCadastrado;
+
     public AgendamentoVO(Long id, UsuarioVO usuarioVO, String nomeUsuario, ServicoVO servicoVO, String nomeServico,
                          ProfissionalVO profissionalVO, String nomeProfissional, BigDecimal valor, LocalDate data,
-                         LocalTime horario, EnumAgendamentoStatus status) {
+                         LocalTime horario, EnumAgendamentoStatus status, String usuarioCadastrado) {
         this.id = id;
         this.usuarioVO = usuarioVO;
         this.nomeUsuario = nomeUsuario;
@@ -67,6 +70,7 @@ public class AgendamentoVO {
         this.data = data;
         this.horario = horario;
         this.status = status;
+        this.usuarioCadastrado = usuarioCadastrado;
     }
 
     public AgendamentoVO(){}
@@ -159,11 +163,24 @@ public class AgendamentoVO {
         this.status = status;
     }
 
+    public String getUsuarioCadastrado() {
+        return usuarioCadastrado;
+    }
+
+    public void setUsuarioCadastrado(String usuarioCadastrado) {
+        this.usuarioCadastrado = usuarioCadastrado;
+    }
+
     @Override
     public final boolean equals(Object o) {
         if (!(o instanceof AgendamentoVO that)) return false;
 
-        return Objects.equals(id, that.id) && Objects.equals(usuarioVO, that.usuarioVO) && Objects.equals(nomeUsuario, that.nomeUsuario) && Objects.equals(servicoVO, that.servicoVO) && Objects.equals(nomeServico, that.nomeServico) && Objects.equals(profissionalVO, that.profissionalVO) && Objects.equals(nomeProfissional, that.nomeProfissional) && Objects.equals(valor, that.valor) && Objects.equals(data, that.data) && Objects.equals(horario, that.horario) && status == that.status;
+        return Objects.equals(id, that.id) && Objects.equals(usuarioVO, that.usuarioVO) &&
+                Objects.equals(nomeUsuario, that.nomeUsuario) && Objects.equals(servicoVO, that.servicoVO) &&
+                Objects.equals(nomeServico, that.nomeServico) && Objects.equals(profissionalVO, that.profissionalVO) &&
+                Objects.equals(nomeProfissional, that.nomeProfissional) && Objects.equals(valor, that.valor) &&
+                Objects.equals(data, that.data) && Objects.equals(horario, that.horario) && status == that.status &&
+                Objects.equals(usuarioCadastrado, that.usuarioCadastrado);
     }
 
     @Override
@@ -179,6 +196,7 @@ public class AgendamentoVO {
         result = 31 * result + Objects.hashCode(data);
         result = 31 * result + Objects.hashCode(horario);
         result = 31 * result + Objects.hashCode(status);
+        result = 31 * result + Objects.hashCode(usuarioCadastrado);
         return result;
     }
 
@@ -196,6 +214,15 @@ public class AgendamentoVO {
                 ", data=" + data +
                 ", horario=" + horario +
                 ", status=" + status +
+                ", usuarioCadastrado=" + usuarioCadastrado +
                 '}';
+    }
+
+    @PreUpdate
+    @PrePersist
+    public void toUpperCase(){
+        if (usuarioCadastrado != null){
+            usuarioCadastrado = usuarioCadastrado.toUpperCase();
+        }
     }
 }
