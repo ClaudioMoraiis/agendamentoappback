@@ -43,7 +43,15 @@ public class AgendamentoDTO {
     @Enumerated(EnumType.STRING)
     private EnumAgendamentoStatus status;
 
-    public AgendamentoDTO(Long usuarioId, Long servicoId, Long profissionalId, BigDecimal valor, LocalDate data, LocalTime horario, EnumAgendamentoStatus status) {
+    @JsonProperty("usuarioCadastrado")
+    @NotNull(message = "Campo 'usuarioCadastrado' não informado no body, verifique!")
+    private String usuarioCadastrado;
+
+    @JsonProperty("nomeUsuario")
+    private String nomeUsuario;
+
+    public AgendamentoDTO(Long usuarioId, Long servicoId, Long profissionalId, BigDecimal valor, LocalDate data,
+                          LocalTime horario, EnumAgendamentoStatus status, String usuarioCadastrado, String nomeUsuario) {
         this.usuarioId = usuarioId;
         this.servicoId = servicoId;
         this.profissionalId = profissionalId;
@@ -51,6 +59,8 @@ public class AgendamentoDTO {
         this.data = data;
         this.horario = horario;
         this.status = status;
+        this.usuarioCadastrado = usuarioCadastrado;
+        this.nomeUsuario = nomeUsuario;
     }
 
     public AgendamentoDTO(){}
@@ -111,13 +121,30 @@ public class AgendamentoDTO {
         this.status = status;
     }
 
+    public String getUsuarioCadastrado() {
+        return usuarioCadastrado;
+    }
+
+    public void setUsuarioCadastrado(String usuarioCadastrado) {
+        this.usuarioCadastrado = usuarioCadastrado;
+    }
+
+    public String getNomeUsuario() {
+        return nomeUsuario;
+    }
+
+    public void setNomeUsuario(String nomeUsuario) {
+        this.nomeUsuario = nomeUsuario;
+    }
+
     @Override
     public final boolean equals(Object o) {
         if (!(o instanceof AgendamentoDTO that)) return false;
 
         return Objects.equals(usuarioId, that.usuarioId) && Objects.equals(servicoId, that.servicoId) &&
                 Objects.equals(profissionalId, that.profissionalId) && Objects.equals(valor, that.valor) &&
-                Objects.equals(data, that.data) && Objects.equals(horario, that.horario) && status == that.status;
+                Objects.equals(data, that.data) && Objects.equals(horario, that.horario) && status == that.status &&
+                Objects.equals(usuarioCadastrado, that.usuarioCadastrado) && Objects.equals(nomeUsuario, that.nomeUsuario);
     }
 
     @Override
@@ -129,6 +156,8 @@ public class AgendamentoDTO {
         result = 31 * result + Objects.hashCode(data);
         result = 31 * result + Objects.hashCode(horario);
         result = 31 * result + Objects.hashCode(status);
+        result = 31 * result + Objects.hashCode(usuarioCadastrado);
+        result = 31 * result + Objects.hashCode(nomeUsuario);
         return result;
     }
 
@@ -142,6 +171,8 @@ public class AgendamentoDTO {
                 ", data=" + data +
                 ", horario=" + horario +
                 ", status=" + status +
+                ", usuarioCadastrado=" + usuarioCadastrado +
+                ", nomeUsuario=" + nomeUsuario +
                 '}';
     }
 }

@@ -222,7 +222,7 @@ public class UsuarioService {
                     ApiResponseUtil.response("Erro", "Nenhum cliente localizado com esse nome"));
         }
 
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
+        return ResponseEntity.status(HttpStatus.OK).body(
                 ApiResponseUtil.response("Sucesso", mUserVO.getId().toString()));
     }
 
