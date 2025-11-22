@@ -2,6 +2,8 @@ package com.example.demo.Agendamento;
 
 import com.example.demo.Profissional.ProfissionalRepository;
 import com.example.demo.Profissional.ProfissionalVO;
+import com.example.demo.ProfissionalHorario.ProfissionalHorarioRepository;
+import com.example.demo.ProfissionalHorario.ProfissionalHorarioVO;
 import com.example.demo.Servico.ServicoRepository;
 import com.example.demo.Servico.ServicoVO;
 import com.example.demo.Usuario.UsuarioRepository;
@@ -9,15 +11,15 @@ import com.example.demo.Usuario.UsuarioVO;
 import com.example.demo.UsuarioToken.UsuarioTokenRepository;
 import com.example.demo.Util.ApiResponseUtil;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cglib.core.Local;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.util.*;
 
 @Service
 public class AgendamentoService {
@@ -33,13 +35,20 @@ public class AgendamentoService {
     @Autowired
     private UsuarioRepository fUsuarioRepository;
 
+    @Autowired
+    private ProfissionalHorarioRepository fProfissionalHorarioRepository;
+
     public AgendamentoVO dtoForVo(AgendamentoDTO mDTO, AgendamentoVO mAgendamentoVO){
         Optional<ProfissionalVO> mProfissionalVO = fProfissionalRepository.findById(mDTO.getProfissionalId());
         Optional<ServicoVO> mServicoVO = fServicoRepository.findById(mDTO.getServicoId());
         Optional<UsuarioVO> mUsuarioVO = fUsuarioRepository.findById(mDTO.getUsuarioId());
 
         mAgendamentoVO.setData(mDTO.getData());
-        mAgendamentoVO.setHorario(mAgendamentoVO.getHorario());
+        mAgendamentoVO.setHorarioIncio(mDTO.getHorario());
+
+        Integer mDuracaoServico = Integer.valueOf(mServicoVO.get().getDuracao().replaceAll("[\\D]", ""));
+        mAgendamentoVO.setHorarioFim(mAgendamentoVO.getHorarioIncio().plusMinutes(mDuracaoServico));
+
         mAgendamentoVO.setStatus(mDTO.getStatus());
         mAgendamentoVO.setValor(mDTO.getValor());
         mAgendamentoVO.setNomeProfissional(mProfissionalVO.get().getNome());
@@ -55,7 +64,6 @@ public class AgendamentoService {
 
         mAgendamentoVO.setProfissionalVO(mProfissionalVO.get());
         mAgendamentoVO.setServicoVO(mServicoVO.get());
-        mAgendamentoVO.setHorario(mDTO.getHorario());
 
         return mAgendamentoVO;
     }
@@ -68,7 +76,8 @@ public class AgendamentoService {
             );
         }
 
-        if (fServicoRepository.findById(mDTO.getServicoId()).isEmpty()){
+        Optional<ServicoVO> mServicoVO = fServicoRepository.findById(mDTO.getServicoId());
+        if (mServicoVO.isEmpty()){
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(
                     ApiResponseUtil.response("Erro", "Nenhum serviço localizado com esse id!")
             );
@@ -104,6 +113,29 @@ public class AgendamentoService {
             );
         }
 
+        List<ProfissionalHorarioVO> mListaProfissionalHorarioVO = fProfissionalHorarioRepository.findByProfissionalVO_id(mVO.get().getId());
+        Integer mDuracaoServico = Integer.valueOf(mServicoVO.get().getDuracao().replaceAll("[\\D]", ""));
+
+        for (ProfissionalHorarioVO mProfissionalHorarioVO : mListaProfissionalHorarioVO){
+            String mDayOfWeek = convertDayForPortuguese(mDTO.getData().getDayOfWeek().toString().toUpperCase());
+
+            if ((mDTO.getHorario().plusMinutes(mDuracaoServico).isAfter(mProfissionalHorarioVO.getHoraFinal())) &&
+                    (mDayOfWeek.equals(mProfissionalHorarioVO.getDiaSemana())) || (fProfissionalHorarioRepository.getByHorario(mDTO.getHorario()) == null)){
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
+                        ApiResponseUtil.response("Erro", "Horário não disponível")
+                );
+            }
+
+            ResponseEntity<?> mHorariosDisponiveis = getAvailableTime(mVO.get().getId(), mServicoVO.get().getId(), mDTO.getData());
+            List<String> mListaHorariosDisponiveis = (List<String>) mHorariosDisponiveis.getBody();
+            for (String mI : mListaHorariosDisponiveis){
+                LocalTime mHorario = LocalTime.parse(mI);
+                //Todo: Aqui agora tem que ver para validar os horarios disponiveis
+            }
+
+
+        }
+
         return null;
     }
 
@@ -128,22 +160,101 @@ public class AgendamentoService {
     }
 
     public List<? extends Object> list(){
-        List<AgendamentoVO> mProfissionalVO = fRepository.findAll();
-        return mProfissionalVO.stream()
+        List<AgendamentoVO> mAgendamentoVO = fRepository.findAll();
+        return mAgendamentoVO.stream()
                 .map(mVO -> {
                     Map<String, Object> map = new HashMap<>();
                     map.put("nomeProfissional", mVO.getNomeProfissional());
                     map.put("profissionalId", mVO.getProfissionalVO().getId());
                     map.put("usuarioNome", mVO.getNomeUsuario());
-                    map.put("usuarioId", mVO.getUsuarioVO().getId());
+                    map.put("usuarioId",
+                            mVO.getUsuarioVO() != null ? mVO.getUsuarioVO().getId() : null);
                     map.put("servico", mVO.getNomeServico());
                     map.put("servicoId", mVO.getServicoVO().getId());
                     map.put("valor", mVO.getValor());
                     map.put("data", mVO.getData());
-                    map.put("horario", mVO.getHorario());
+                    map.put("horarioInicio", mVO.getHorarioIncio());
+                    map.put("horarioFim", mVO.getHorarioFim());
                     map.put("status", mVO.getStatus());
                     return map;
                 })
                 .toList();
+    }
+
+    public ResponseEntity<?> getAvailableTime(Long mProfissionalId, Long mServicoId, LocalDate mData) {
+        String mDayOfWeek = convertDayForPortuguese(mData.getDayOfWeek().toString().toUpperCase());
+        ProfissionalHorarioVO mProfissionalHorarioVO =
+                fProfissionalHorarioRepository.findByProfissionalVO_IdAndDiaSemanaContaining(
+                        mProfissionalId, mDayOfWeek);
+
+        List<AgendamentoVO> mAgendamentos = fRepository
+                .findByProfissionalVO_IdAndDataAndStatusIn(
+                        mProfissionalId,
+                        mData,
+                        List.of(EnumAgendamentoStatus.CONCLUIDO, EnumAgendamentoStatus.CONFIRMADO)
+                );
+
+        Optional<ServicoVO> mServicoVO = fServicoRepository.findById(mServicoId);
+        Integer mDuracaoServico = Integer.valueOf(mServicoVO.get().getDuracao().replaceAll("[\\D]", ""));
+
+        LocalTime mHorainicio = mProfissionalHorarioVO.getHoraInicial();
+        LocalTime mHorafim    = mProfissionalHorarioVO.getHoraFinal();
+        LocalTime mHoraAtual  = mHorainicio;
+        List<LocalTime> mHorariosPossiveis = new ArrayList<>();
+
+        while (mHoraAtual.isBefore(mHorafim)) {
+            mHorariosPossiveis.add(mHoraAtual);
+            mHoraAtual = mHoraAtual.plusMinutes(mDuracaoServico);
+        }
+
+        List<LocalTime> mHorariosLivres = mHorariosPossiveis.stream()
+                .filter(horario -> mAgendamentos.stream().noneMatch(a -> {
+                    LocalTime inicio = a.getHorarioIncio();
+                    LocalTime fim = a.getHorarioFim();
+
+                    if (inicio == null || fim == null) {
+                        return false;
+                    }
+
+                    return horario.isBefore(fim) &&
+                            horario.plusMinutes(mDuracaoServico).isAfter(inicio);
+                }))
+                .toList();
+
+        List<String> mResposta = mHorariosLivres.stream()
+                .map(LocalTime::toString)
+                .toList();
+
+        return ResponseEntity.ok().body(mResposta);
+    }
+
+
+    public String convertDayForPortuguese(String mDay){
+        String mConvertDay = "";
+        switch (mDay){
+            case "MONDAY":
+                mConvertDay = "seg";
+                break;
+            case "TUESDAY":
+                mConvertDay = "ter";
+                break;
+            case "WEDNESDAY":
+                mConvertDay = "qua";
+                break;
+            case "THURSDAY":
+                mConvertDay = "qui";
+                break;
+            case "FRIDAY":
+                mConvertDay = "sex";
+                break;
+            case "SATURDAY":
+                mConvertDay = "sab";
+                break;
+            case "SUNDAY":
+                mConvertDay = "dom";
+                break;
+        }
+
+        return mConvertDay;
     }
 }

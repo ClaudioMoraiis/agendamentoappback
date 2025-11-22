@@ -46,8 +46,11 @@ public class AgendamentoVO {
     @Column(name = "age_data")
     private LocalDate data;
 
-    @Column(name = "age_horario")
-    private LocalTime horario;
+    @Column(name = "age_horario_incio")
+    private LocalTime horarioIncio;
+
+    @Column(name = "age_horario_fim")
+    private LocalTime horarioFim;
 
     @Column(name = "age_status")
     @Enumerated(EnumType.STRING)
@@ -58,7 +61,7 @@ public class AgendamentoVO {
 
     public AgendamentoVO(Long id, UsuarioVO usuarioVO, String nomeUsuario, ServicoVO servicoVO, String nomeServico,
                          ProfissionalVO profissionalVO, String nomeProfissional, BigDecimal valor, LocalDate data,
-                         LocalTime horario, EnumAgendamentoStatus status, String usuarioCadastrado) {
+                         LocalTime horarioIncio, LocalTime horarioFim, EnumAgendamentoStatus status, String usuarioCadastrado) {
         this.id = id;
         this.usuarioVO = usuarioVO;
         this.nomeUsuario = nomeUsuario;
@@ -68,7 +71,8 @@ public class AgendamentoVO {
         this.nomeProfissional = nomeProfissional;
         this.valor = valor;
         this.data = data;
-        this.horario = horario;
+        this.horarioIncio = horarioIncio;
+        this.horarioFim = horarioFim;
         this.status = status;
         this.usuarioCadastrado = usuarioCadastrado;
     }
@@ -147,12 +151,20 @@ public class AgendamentoVO {
         this.data = data;
     }
 
-    public LocalTime getHorario() {
-        return horario;
+    public LocalTime getHorarioIncio() {
+        return horarioIncio;
     }
 
-    public void setHorario(LocalTime horario) {
-        this.horario = horario;
+    public void setHorarioIncio(LocalTime horarioIncio) {
+        this.horarioIncio = horarioIncio;
+    }
+
+    public LocalTime getHorarioFim() {
+        return horarioFim;
+    }
+
+    public void setHorarioFim(LocalTime horarioFim) {
+        this.horarioFim = horarioFim;
     }
 
     public EnumAgendamentoStatus getStatus() {
@@ -175,12 +187,7 @@ public class AgendamentoVO {
     public final boolean equals(Object o) {
         if (!(o instanceof AgendamentoVO that)) return false;
 
-        return Objects.equals(id, that.id) && Objects.equals(usuarioVO, that.usuarioVO) &&
-                Objects.equals(nomeUsuario, that.nomeUsuario) && Objects.equals(servicoVO, that.servicoVO) &&
-                Objects.equals(nomeServico, that.nomeServico) && Objects.equals(profissionalVO, that.profissionalVO) &&
-                Objects.equals(nomeProfissional, that.nomeProfissional) && Objects.equals(valor, that.valor) &&
-                Objects.equals(data, that.data) && Objects.equals(horario, that.horario) && status == that.status &&
-                Objects.equals(usuarioCadastrado, that.usuarioCadastrado);
+        return Objects.equals(id, that.id) && Objects.equals(usuarioVO, that.usuarioVO) && Objects.equals(nomeUsuario, that.nomeUsuario) && Objects.equals(servicoVO, that.servicoVO) && Objects.equals(nomeServico, that.nomeServico) && Objects.equals(profissionalVO, that.profissionalVO) && Objects.equals(nomeProfissional, that.nomeProfissional) && Objects.equals(valor, that.valor) && Objects.equals(data, that.data) && Objects.equals(horarioIncio, that.horarioIncio) && Objects.equals(horarioFim, that.horarioFim) && status == that.status && Objects.equals(usuarioCadastrado, that.usuarioCadastrado);
     }
 
     @Override
@@ -194,7 +201,8 @@ public class AgendamentoVO {
         result = 31 * result + Objects.hashCode(nomeProfissional);
         result = 31 * result + Objects.hashCode(valor);
         result = 31 * result + Objects.hashCode(data);
-        result = 31 * result + Objects.hashCode(horario);
+        result = 31 * result + Objects.hashCode(horarioIncio);
+        result = 31 * result + Objects.hashCode(horarioFim);
         result = 31 * result + Objects.hashCode(status);
         result = 31 * result + Objects.hashCode(usuarioCadastrado);
         return result;
@@ -212,9 +220,10 @@ public class AgendamentoVO {
                 ", nomeProfissional='" + nomeProfissional + '\'' +
                 ", valor=" + valor +
                 ", data=" + data +
-                ", horario=" + horario +
+                ", horarioIncio=" + horarioIncio +
+                ", horarioFim=" + horarioFim +
                 ", status=" + status +
-                ", usuarioCadastrado=" + usuarioCadastrado +
+                ", usuarioCadastrado='" + usuarioCadastrado + '\'' +
                 '}';
     }
 
