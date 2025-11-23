@@ -113,27 +113,24 @@ public class AgendamentoService {
             );
         }
 
-        List<ProfissionalHorarioVO> mListaProfissionalHorarioVO = fProfissionalHorarioRepository.findByProfissionalVO_id(mVO.get().getId());
-        Integer mDuracaoServico = Integer.valueOf(mServicoVO.get().getDuracao().replaceAll("[\\D]", ""));
+        List<String> mHorariosDisponiveis =
+                (List<String>) getAvailableTime(
+                        mVO.get().getId(),
+                        mServicoVO.get().getId(),
+                        mDTO.getData()
+                ).getBody();
 
-        for (ProfissionalHorarioVO mProfissionalHorarioVO : mListaProfissionalHorarioVO){
-            String mDayOfWeek = convertDayForPortuguese(mDTO.getData().getDayOfWeek().toString().toUpperCase());
+        if (mHorariosDisponiveis == null || mHorariosDisponiveis.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
+                    ApiResponseUtil.response("Erro", "Nenhum horário disponível para essa data")
+            );
+        }
 
-            if ((mDTO.getHorario().plusMinutes(mDuracaoServico).isAfter(mProfissionalHorarioVO.getHoraFinal())) &&
-                    (mDayOfWeek.equals(mProfissionalHorarioVO.getDiaSemana())) || (fProfissionalHorarioRepository.getByHorario(mDTO.getHorario()) == null)){
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
-                        ApiResponseUtil.response("Erro", "Horário não disponível")
-                );
-            }
-
-            ResponseEntity<?> mHorariosDisponiveis = getAvailableTime(mVO.get().getId(), mServicoVO.get().getId(), mDTO.getData());
-            List<String> mListaHorariosDisponiveis = (List<String>) mHorariosDisponiveis.getBody();
-            for (String mI : mListaHorariosDisponiveis){
-                LocalTime mHorario = LocalTime.parse(mI);
-                //Todo: Aqui agora tem que ver para validar os horarios disponiveis
-            }
-
-
+        String mHorarioStr = mDTO.getHorario().toString();
+        if (!mHorariosDisponiveis.contains(mHorarioStr)) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
+                    ApiResponseUtil.response("Erro", "Horário não disponível")
+            );
         }
 
         return null;

@@ -27,9 +27,11 @@ public interface ProfissionalHorarioRepository extends JpaRepository<Profissiona
                 SELECT *
                 FROM horario_profissional
                 WHERE (:mHorario BETWEEN hpr_hora_inicio and hpr_hora_final)
+                AND (hpr_dia_semana LIKE %:mDiaSemana%)
                     """,
             nativeQuery = true
     )
-    public ProfissionalHorarioVO getByHorario(@Param("mHorario") @DateTimeFormat(pattern = "HH:mm") LocalTime mHorario);
+    public ProfissionalHorarioVO getByHorario(@Param("mHorario") @DateTimeFormat(pattern = "HH:mm") LocalTime mHorario,
+                                              @Param("mDiaSemana") String mDiaSemana);
 
 }
