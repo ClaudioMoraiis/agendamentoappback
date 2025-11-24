@@ -38,6 +38,8 @@ public class AgendamentoService {
     @Autowired
     private ProfissionalHorarioRepository fProfissionalHorarioRepository;
 
+    private Long fAgendamentoId;
+
     public AgendamentoVO dtoForVo(AgendamentoDTO mDTO, AgendamentoVO mAgendamentoVO){
         Optional<ProfissionalVO> mProfissionalVO = fProfissionalRepository.findById(mDTO.getProfissionalId());
         Optional<ServicoVO> mServicoVO = fServicoRepository.findById(mDTO.getServicoId());
@@ -113,6 +115,12 @@ public class AgendamentoService {
             );
         }
 
+        if (fRepository.findById(fAgendamentoId).isEmpty()){
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
+                    ApiResponseUtil.response("Erro", "Nenhum agendamento encontrado com esse id!")
+            );
+        }
+
         List<String> mHorariosDisponiveis =
                 (List<String>) getAvailableTime(
                         mVO.get().getId(),
@@ -161,6 +169,7 @@ public class AgendamentoService {
         return mAgendamentoVO.stream()
                 .map(mVO -> {
                     Map<String, Object> map = new HashMap<>();
+                    map.put("id", mVO.getId());
                     map.put("nomeProfissional", mVO.getNomeProfissional());
                     map.put("profissionalId", mVO.getProfissionalVO().getId());
                     map.put("usuarioNome", mVO.getNomeUsuario());
@@ -253,5 +262,46 @@ public class AgendamentoService {
         }
 
         return mConvertDay;
+    }
+
+    public ResponseEntity<?> edit(AgendamentoDTO mDTO, Long mId){
+        Optional<AgendamentoVO> mAgendamentoVO = fRepository.findById(mId);
+        fAgendamentoId = mId;
+
+        ResponseEntity mValidacao = isValid(mDTO);
+        if (mValidacao != null){
+            return mValidacao;
+        }
+        try {
+            mAgendamentoVO = Optional.ofNullable(dtoForVo(mDTO, mAgendamentoVO.get()));
+            fRepository.save(mAgendamentoVO.get());
+            return ResponseEntity.status(HttpStatus.OK).body(
+                    ApiResponseUtil.response("Sucesso", "Agendamento alterado com sucesso!")
+            );
+        }catch (Exception e){
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
+                    ApiResponseUtil.response("Erro", e.getMessage())
+            );
+        }
+    }
+
+    public ResponseEntity<?> delete(Long mId){
+        Optional<AgendamentoVO> mAgendamentoVO = fRepository.findById(mId);
+        if (mAgendamentoVO.isEmpty()){
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(
+                    ApiResponseUtil.response("Erro", "Nenhum agendamento localizado com esse id!")
+            );
+        }
+
+        try {
+            fRepository.delete(mAgendamentoVO.get());
+            return ResponseEntity.status(HttpStatus.OK).body(
+                    ApiResponseUtil.response("Sucesso", "Agendamento excluido com sucesso!")
+            );
+        }catch (Exception e){
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
+                    ApiResponseUtil.response("Erro", e.getMessage())
+            );
+        }
     }
 }

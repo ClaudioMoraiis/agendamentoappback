@@ -30,4 +30,14 @@ public class AgendamentoRota {
                                                  @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate data){
         return fService.getAvailableTime(profissionalId, servicoId, data);
     }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<?> edit(@RequestBody @Valid AgendamentoDTO mDTO, @PathVariable Long id){
+        return fService.edit(mDTO, id);
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<?> delete(@PathVariable Long id){
+        return fService.delete(id);
+    }
 }
