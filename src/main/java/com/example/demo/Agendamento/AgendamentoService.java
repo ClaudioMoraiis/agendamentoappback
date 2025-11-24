@@ -71,6 +71,13 @@ public class AgendamentoService {
     }
 
     public ResponseEntity<?>isValid(AgendamentoDTO mDTO){
+        Optional<AgendamentoVO> mAgendamentoVO = fRepository.findById(fAgendamentoId);
+        if (mAgendamentoVO.isEmpty()){
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
+                    ApiResponseUtil.response("Erro", "Nenhum agendamento encontrado com esse id!")
+            );
+        }
+
         Optional<ProfissionalVO> mVO = fProfissionalRepository.findById(mDTO.getProfissionalId());
         if (fProfissionalRepository.findById(mDTO.getProfissionalId()).isEmpty()){
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(
@@ -115,12 +122,6 @@ public class AgendamentoService {
             );
         }
 
-        if (fRepository.findById(fAgendamentoId).isEmpty()){
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
-                    ApiResponseUtil.response("Erro", "Nenhum agendamento encontrado com esse id!")
-            );
-        }
-
         List<String> mHorariosDisponiveis =
                 (List<String>) getAvailableTime(
                         mVO.get().getId(),
@@ -135,10 +136,12 @@ public class AgendamentoService {
         }
 
         String mHorarioStr = mDTO.getHorario().toString();
-        if (!mHorariosDisponiveis.contains(mHorarioStr)) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
-                    ApiResponseUtil.response("Erro", "Horário não disponível")
-            );
+        if (!mHorarioStr.equals(mAgendamentoVO.get().getHorarioIncio().toString())) {
+            if (!mHorariosDisponiveis.contains(mHorarioStr)) {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
+                        ApiResponseUtil.response("Erro", "Horário não disponível")
+                );
+            }
         }
 
         return null;
