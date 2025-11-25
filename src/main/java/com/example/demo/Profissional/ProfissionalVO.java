@@ -23,19 +23,19 @@ public class ProfissionalVO {
     @Column(name = "pro_celular")
     private String celular;
 
-    @Column(name = "pro_status")
-    private String status;
+    @Column(name = "pro_ativo")
+    private String ativo;
 
     @ManyToOne
     @JoinColumn(name = "pro_esp_id", referencedColumnName = "esp_id", nullable = false)
     private EspecialidadeVO especialidadeVO;
 
-    public ProfissionalVO(Long id, String nome, String email, String celular, String status, EspecialidadeVO especialidadeVO) {
+    public ProfissionalVO(Long id, String nome, String email, String celular, String ativo, EspecialidadeVO especialidadeVO) {
         this.id = id;
         this.nome = nome;
         this.email = email;
         this.celular = celular;
-        this.status = status;
+        this.ativo = ativo;
         this.especialidadeVO = especialidadeVO;
     }
 
@@ -73,12 +73,12 @@ public class ProfissionalVO {
         this.celular = celular;
     }
 
-    public String getStatus() {
-        return status;
+    public String getAtivo() {
+        return ativo;
     }
 
-    public void setStatus(String status) {
-        this.status = status;
+    public void setAtivo(String status) {
+        this.ativo = ativo;
     }
 
     public EspecialidadeVO getEspecialidadeVO() {
@@ -93,12 +93,13 @@ public class ProfissionalVO {
     public boolean equals(Object o) {
         if (o == null || getClass() != o.getClass()) return false;
         ProfissionalVO that = (ProfissionalVO) o;
-        return Objects.equals(id, that.id) && Objects.equals(nome, that.nome) && Objects.equals(email, that.email) && Objects.equals(celular, that.celular) && Objects.equals(status, that.status) && Objects.equals(especialidadeVO, that.especialidadeVO);
+        return Objects.equals(id, that.id) && Objects.equals(nome, that.nome) && Objects.equals(email, that.email) &&
+                Objects.equals(celular, that.celular) && Objects.equals(ativo, that.ativo) && Objects.equals(especialidadeVO, that.especialidadeVO);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, nome, email, celular, status, especialidadeVO);
+        return Objects.hash(id, nome, email, celular, ativo, especialidadeVO);
     }
 
     @Override
@@ -108,7 +109,7 @@ public class ProfissionalVO {
                 ", nome='" + nome + '\'' +
                 ", email='" + email + '\'' +
                 ", celular='" + celular + '\'' +
-                ", status='" + status + '\'' +
+                ", ativo='" + ativo + '\'' +
                 ", especialidadeVO=" + especialidadeVO +
                 '}';
     }
@@ -124,8 +125,8 @@ public class ProfissionalVO {
             email = email.toUpperCase();
         }
 
-        if (status != null){
-            status = status.toUpperCase();
+        if (ativo != null){
+            ativo = ativo.toUpperCase();
         }
     }
 }

@@ -26,7 +26,7 @@ public class ProfissionalService {
     public ProfissionalVO converterDtoParaVO(ProfissionalDTO mDTO, ProfissionalVO mVO){
         mVO.setCelular(Util.formatarTelefone(mDTO.getTelefone()));
         mVO.setEmail(mDTO.getEmail());
-        mVO.setStatus(mDTO.getStatus());
+        mVO.setAtivo(mDTO.getAtivo());
         mVO.setNome(mDTO.getNome());
 
         return mVO;
@@ -57,15 +57,25 @@ public class ProfissionalService {
             );
         }
 
-        if (!mDTO.getStatus().toUpperCase().matches(".*(TRUE|FALSE).*")){
+        if (!mDTO.getAtivo().toUpperCase().matches(".*(TRUE|FALSE).*")){
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(
                     ApiResponseUtil.response("Erro", "No campo status informe TRUE ou FALSE!")
             );
         }
 
-        if (fRepository.findFirstByNome(mDTO.getNome()) != null){
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(
+        boolean mExisteProfissional = (mDTO.getId() != null) ? fRepository.existsByNomeAndIdNot(mDTO.getNome(), mDTO.getId()) : fRepository.existsByNome(mDTO.getNome());
+        if (mExisteProfissional){
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(
                     ApiResponseUtil.response("Erro", "Já existe profissional com esse nome!")
+            );
+        }
+
+        if (((mDTO.getId() != null) &&
+             (!fRepository.getAtivo(mDTO.getId()).equals(mDTO.getAtivo())) &&
+             (fRepository.getAgendemento(mDTO.getId()) != null) &&
+             (mDTO.getAtivo().toUpperCase().equals("FALSE")))){
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(
+                    ApiResponseUtil.response("Erro", "Não é possível inativar com agendamento ativo ou pendente")
             );
         }
 
@@ -105,7 +115,7 @@ public class ProfissionalService {
                     map.put("telefone", mVO.getCelular());
                     map.put("id", mVO.getId());
                     map.put("especialidade", mVO.getEspecialidadeVO().getNome());
-                    map.put("status", mVO.getStatus());
+                    map.put("ativo", mVO.getAtivo());
                     return map;
                 })
                 .toList();

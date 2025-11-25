@@ -73,11 +73,11 @@ public class ProfissionalDTO {
         this.especialidade = especialidade;
     }
 
-    public String getStatus() {
+    public String getAtivo() {
         return ativo;
     }
 
-    public void setStatus(String status) {
+    public void setAtivo(String status) {
         this.ativo = status;
     }
 
@@ -109,7 +109,7 @@ public class ProfissionalDTO {
                 "nome='" + nome + '\'' +
                 ", telefone='" + telefone + '\'' +
                 ", especialidade='" + especialidade + '\'' +
-                ", status='" + ativo + '\'' +
+                ", ativo='" + ativo + '\'' +
                 ", email='" + email + '\'' +
                 '}';
     }
