@@ -48,7 +48,7 @@ public class AgendamentoService {
         mAgendamentoVO.setData(mDTO.getData());
         mAgendamentoVO.setHorarioIncio(mDTO.getHorario());
 
-        Integer mDuracaoServico = Integer.valueOf(mServicoVO.get().getDuracao().replaceAll("[\\D]", ""));
+        Long mDuracaoServico = mServicoVO.get().getDuracao();
         mAgendamentoVO.setHorarioFim(mAgendamentoVO.getHorarioIncio().plusMinutes(mDuracaoServico));
 
         mAgendamentoVO.setStatus(mDTO.getStatus());
@@ -123,11 +123,13 @@ public class AgendamentoService {
         }
 
         List<String> mHorariosDisponiveis =
-                (List<String>) getAvailableTime(
-                        mVO.get().getId(),
-                        mServicoVO.get().getId(),
-                        mDTO.getData()
-                ).getBody();
+                Optional.ofNullable(
+                        (List<String>) getAvailableTime(
+                                mDTO.getProfissionalId(),
+                                mServicoVO.get().getId(),
+                                mDTO.getData()
+                        ).getBody()
+                ).orElseGet(Collections::emptyList);
 
         if (mHorariosDisponiveis == null || mHorariosDisponiveis.isEmpty()) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
@@ -196,6 +198,11 @@ public class AgendamentoService {
                 fProfissionalHorarioRepository.findByProfissionalVO_IdAndDiaSemanaContaining(
                         mProfissionalId, mDayOfWeek);
 
+        if (mProfissionalHorarioVO == null){
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(Collections.emptyList());
+        }
+
         List<AgendamentoVO> mAgendamentos = fRepository
                 .findByProfissionalVO_IdAndDataAndStatusIn(
                         mProfissionalId,
@@ -204,7 +211,7 @@ public class AgendamentoService {
                 );
 
         Optional<ServicoVO> mServicoVO = fServicoRepository.findById(mServicoId);
-        Integer mDuracaoServico = Integer.valueOf(mServicoVO.get().getDuracao().replaceAll("[\\D]", ""));
+        Long mDuracaoServico = mServicoVO.get().getDuracao();
 
         LocalTime mHorainicio = mProfissionalHorarioVO.getHoraInicial();
         LocalTime mHorafim    = mProfissionalHorarioVO.getHoraFinal();

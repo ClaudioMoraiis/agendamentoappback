@@ -15,16 +15,16 @@ public class ServicoDTO {
 
     @JsonProperty("duracao")
     @NotNull(message = "Informe o campo 'duracao' no body")
-    private String duracao;
+    private Long duracao;
 
     @DecimalMin("0.0")
     @JsonProperty("preco")
     @NotNull(message = "Informe o campo 'preco' no body")
     private BigDecimal preco;
 
-    public ServicoDTO(String nome, String email, BigDecimal preco) {
+    public ServicoDTO(String nome, Long duracao, BigDecimal preco) {
         this.nome = nome;
-        this.duracao = email;
+        this.duracao = duracao;
         this.preco = preco;
     }
 
@@ -38,11 +38,11 @@ public class ServicoDTO {
         this.nome = nome;
     }
 
-    public String getDuracao() {
+    public Long getDuracao() {
         return duracao;
     }
 
-    public void setDuracao(String duracao) {
+    public void setDuracao(Long duracao) {
         this.duracao = duracao;
     }
 

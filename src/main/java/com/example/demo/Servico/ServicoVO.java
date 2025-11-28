@@ -17,12 +17,12 @@ public class ServicoVO {
     private String nome;
 
     @Column(name = "ser_duracao")
-    private String duracao;
+    private Long duracao;
 
     @Column(name = "ser_valor")
     private BigDecimal valor;
 
-    public ServicoVO(Long id, String nome, String duracao, BigDecimal valor) {
+    public ServicoVO(Long id, String nome, Long duracao, BigDecimal valor) {
         this.id = id;
         this.nome = nome;
         this.duracao = duracao;
@@ -47,11 +47,11 @@ public class ServicoVO {
         this.nome = nome;
     }
 
-    public String getDuracao() {
+    public Long getDuracao() {
         return duracao;
     }
 
-    public void setDuracao(String duracao) {
+    public void setDuracao(Long duracao) {
         this.duracao = duracao;
     }
 
@@ -94,10 +94,6 @@ public class ServicoVO {
     public void toUpperCase() {
         if (nome != null) {
             nome = nome.toUpperCase();
-        }
-
-        if (duracao != null) {
-            duracao = duracao.toUpperCase();
         }
     }
 }

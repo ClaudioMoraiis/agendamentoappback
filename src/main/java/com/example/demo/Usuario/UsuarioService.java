@@ -75,7 +75,7 @@ public class UsuarioService {
                     ApiResponseUtil.response("Erro", "E-mail não informado!"));
         }
 
-        if (fRepository.findByNome(mDto.getNome().toUpperCase()) != null){
+        if (fRepository.existsByNomeAndIdNot(mDto.getNome().toUpperCase(), mId)){
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
                     ApiResponseUtil.response("Erro", "Já existe cliente com esse nome!"));
         }
