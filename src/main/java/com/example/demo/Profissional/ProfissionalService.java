@@ -51,7 +51,7 @@ public class ProfissionalService {
             );
         }
 
-        if (fRepository.existsByCelularAndIdNot(mDTO.getTelefone(), mDTO.getId())){
+        if (fRepository.existsByCelularAndIdNot(Util.formatarTelefone(mDTO.getTelefone()), mDTO.getId())){
             return ResponseEntity.status(HttpStatus.CONFLICT).body(
                     ApiResponseUtil.response("Erro", "Já existe profissional com esse número de celular!")
             );

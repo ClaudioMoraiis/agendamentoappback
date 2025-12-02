@@ -6,6 +6,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
+import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/profissional-horario")
@@ -18,4 +20,8 @@ public class ProfissionalHorarioRota {
         return fService.register(mDTO);
     }
 
+    @GetMapping("/list")
+    private List<Map<String, Object>> list(){
+        return fService.list();
+    }
 }

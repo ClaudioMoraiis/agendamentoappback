@@ -40,4 +40,14 @@ public class AgendamentoRota {
     public ResponseEntity<?> delete(@PathVariable Long id){
         return fService.delete(id);
     }
+
+    @GetMapping("list/{id}")
+    public List<? extends Object> listPerClient(@PathVariable Long id){
+        return fService.listPerClient(id);
+    }
+
+    @PutMapping("/cancel/{id}")
+    public ResponseEntity<?> cancel(@PathVariable Long id){
+        return fService.cancel(id);
+    }
 }

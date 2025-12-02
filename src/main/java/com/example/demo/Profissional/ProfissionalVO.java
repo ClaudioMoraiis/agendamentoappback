@@ -78,7 +78,7 @@ public class ProfissionalVO {
     }
 
     public void setAtivo(String status) {
-        this.ativo = ativo;
+        this.ativo = status;
     }
 
     public EspecialidadeVO getEspecialidadeVO() {

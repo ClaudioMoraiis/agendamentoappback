@@ -10,6 +10,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @Service
@@ -53,5 +56,20 @@ public class ProfissionalHorarioService {
                     ApiResponseUtil.response("Erro", e.getMessage())
             );
         }
+    }
+
+    public List<Map<String, Object>> list(){
+        List<ProfissionalHorarioVO> mProfissionalHorarioVO = fRepository.findAll();
+        return mProfissionalHorarioVO.stream()
+                .map(mVO -> {
+                    Map<String, Object> map = new HashMap<>();
+                    map.put("nome", mVO.getProfissionalVO().getNome());
+                    map.put("diaSemana", mVO.getDiaSemana());
+                    map.put("horaFinal", mVO.getHoraFinal());
+                    map.put("id", mVO.getId());
+                    map.put("horaInicial", mVO.getHoraInicial());
+                    return map;
+                })
+                .toList();
     }
 }

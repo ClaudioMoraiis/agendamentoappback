@@ -124,7 +124,7 @@ public class UsuarioService {
 
             var mToken = fTokenService.generateToken((UsuarioVO) mAuth.getPrincipal());
             return ResponseEntity.status(HttpStatus.OK).body(
-                    ApiResponseUtil.response("Sucesso", "Login realizado com sucesso\n" + "Token: " + mToken));
+                    ApiResponseUtil.response("Sucesso", "Login realizado com sucesso\n" + "Token: " + mToken + " ID :" + mVO.getId()));
         } catch (Exception e) {
             e.printStackTrace();
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(

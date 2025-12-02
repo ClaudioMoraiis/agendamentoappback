@@ -14,4 +14,5 @@ public interface AgendamentoRepository extends JpaRepository<AgendamentoVO, Long
             List<EnumAgendamentoStatus> status
     );
 
+    List<AgendamentoVO> findAllById(Long mId);
 }
