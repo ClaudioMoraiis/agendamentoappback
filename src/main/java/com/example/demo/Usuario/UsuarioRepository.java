@@ -3,6 +3,8 @@ package com.example.demo.Usuario;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
+import java.util.Optional;
+
 @Repository
 public interface UsuarioRepository extends JpaRepository<UsuarioVO, Long> {
     UsuarioVO findByEmail(String mEmail);
@@ -11,4 +13,5 @@ public interface UsuarioRepository extends JpaRepository<UsuarioVO, Long> {
     boolean existsByCpfAndIdNot(String email, Long id);
     UsuarioVO findByNome(String mNome);
     boolean existsByNomeAndIdNot(String mNome, Long id);
+    boolean existsById(Long mId);
 }
