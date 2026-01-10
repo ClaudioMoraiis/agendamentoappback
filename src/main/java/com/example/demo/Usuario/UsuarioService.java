@@ -1,5 +1,6 @@
 package com.example.demo.Usuario;
 
+import com.example.demo.Enum.UserRole;
 import com.example.demo.Jwt.TokenService;
 import com.example.demo.UsuarioToken.UsuarioTokenRepository;
 import com.example.demo.UsuarioToken.UsuarioTokenVO;
@@ -94,6 +95,7 @@ public class UsuarioService {
         mUsuarioVO.setCelular(Util.formatarTelefone(mDto.getCelular()));
         mUsuarioVO.setEmail(mDto.getEmail().toUpperCase());
         mUsuarioVO.setNome(mDto.getNome().toUpperCase());
+        mUsuarioVO.setRole(UserRole.CLIENT);
 
         String mSenha = fPasswordEncoder.encode(mDto.getSenha());
         mUsuarioVO.setSenha(mSenha);

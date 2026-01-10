@@ -30,14 +30,23 @@ public class SecurityFilter extends OncePerRequestFilter {
 
         String path = request.getServletPath();
 
-        // endpoints públicos: não toca no SecurityContext
-        if (path.startsWith("/usuario/login") || path.startsWith("/usuario/cadastrar") ||
-                path.startsWith("/usuario/recuperar-senha") || path.startsWith("/usuario/redefinir-senha")) {
+        // Adicione TODAS as rotas públicas do Swagger
+        if (path.startsWith("/usuario/login") ||
+                path.startsWith("/usuario/cadastrar") ||
+                path.startsWith("/usuario/recuperar-senha") ||
+                path.startsWith("/usuario/redefinir-senha") ||
+                path.startsWith("/v3/api-docs") ||
+                path.startsWith("/swagger-ui") ||
+                path.startsWith("/swagger-resources") ||
+                path.startsWith("/webjars") ||
+                path.startsWith("/swagger-ui.html") ||
+                path.equals("/swagger-ui/index.html") ||
+                path.equals("/swagger-ui/")) {
             filterChain.doFilter(request, response);
             return;
         }
 
-        // endpoints privados
+        // Restante do código permanece igual...
         var token = this.recoverToken(request);
         if (token != null) {
             try {
@@ -50,7 +59,6 @@ public class SecurityFilter extends OncePerRequestFilter {
                 return;
             }
         } else {
-            // se não houver token, não faz autenticação
             response.setStatus(HttpServletResponse.SC_FORBIDDEN);
             return;
         }
@@ -62,6 +70,6 @@ public class SecurityFilter extends OncePerRequestFilter {
         var authHeader = request.getHeader("Authorization");
         if (authHeader == null) return null;
         return authHeader.replace("Bearer ", "");
-
     }
+
 }

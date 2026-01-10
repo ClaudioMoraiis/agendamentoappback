@@ -124,7 +124,7 @@ public class AgendamentoService {
 
         List<String> mHorariosDisponiveis =
                 Optional.ofNullable(
-                        (List<String>) getAvailableTime(
+                        (List<String>) getAvailableTimeProfissional(
                                 mDTO.getProfissionalId(),
                                 mServicoVO.get().getId(),
                                 mDTO.getData()
@@ -199,7 +199,7 @@ public class AgendamentoService {
     }
 
     public List<? extends Object> listPerClient(Long mId) {
-        List<AgendamentoVO> mAgendamentoVO = fRepository.findAllById(mId);
+        List<AgendamentoVO> mAgendamentoVO = fRepository.listById(mId);
         return mAgendamentoVO.stream()
                 .map(mVO -> {
                     Map<String, Object> map = new HashMap<>();
@@ -221,7 +221,7 @@ public class AgendamentoService {
                 .toList();
     }
 
-    public ResponseEntity<?> getAvailableTime(Long mProfissionalId, Long mServicoId, LocalDate mData) {
+    public ResponseEntity<?> getAvailableTimeProfissional(Long mProfissionalId, Long mServicoId, LocalDate mData) {
         String mDayOfWeek = convertDayForPortuguese(mData.getDayOfWeek().toString().toUpperCase());
         ProfissionalHorarioVO mProfissionalHorarioVO =
                 fProfissionalHorarioRepository.findByProfissionalVO_IdAndDiaSemanaContaining(
@@ -363,7 +363,7 @@ public class AgendamentoService {
         mVO.setStatus(EnumAgendamentoStatus.CANCELADO);
         try {
             fRepository.save(mVO);
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(
+            return ResponseEntity.status(HttpStatus.OK).body(
                     ApiResponseUtil.response("Sucesso", "Agendamento cancelado!"));
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(

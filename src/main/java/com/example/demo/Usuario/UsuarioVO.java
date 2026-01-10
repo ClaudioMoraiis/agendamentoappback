@@ -1,5 +1,6 @@
 package com.example.demo.Usuario;
 
+import com.example.demo.Enum.UserRole;
 import jakarta.persistence.*;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -30,13 +31,18 @@ public class UsuarioVO implements UserDetails {
     @Column(name = "usu_cpf")
     private String cpf;
 
-    public UsuarioVO(Long id, String nome, String email, String senha, String celular, String cpf) {
+    @Column(name = "usu_role")
+    @Enumerated(EnumType.STRING)
+    private UserRole role;
+
+    public UsuarioVO(Long id, String nome, String email, String senha, String celular, String cpf, UserRole role) {
         this.id = id;
         this.nome = nome;
         this.email = email;
         this.senha = senha;
         this.celular = celular;
         this.cpf = cpf;
+        this.role = role;
     }
 
     public UsuarioVO(){};
@@ -89,11 +95,20 @@ public class UsuarioVO implements UserDetails {
         this.cpf = cpf;
     }
 
+    public UserRole getRole() {
+        return role;
+    }
+
+    public void setRole(UserRole role) {
+        this.role = role;
+    }
+
     @Override
     public final boolean equals(Object o) {
         if (!(o instanceof UsuarioVO usuarioVO)) return false;
 
-        return id.equals(usuarioVO.id) && nome.equals(usuarioVO.nome) && email.equals(usuarioVO.email) && senha.equals(usuarioVO.senha) && celular.equals(usuarioVO.celular) && cpf.equals(usuarioVO.cpf);
+        return id.equals(usuarioVO.id) && nome.equals(usuarioVO.nome) && email.equals(usuarioVO.email) &&
+                senha.equals(usuarioVO.senha) && celular.equals(usuarioVO.celular) && cpf.equals(usuarioVO.cpf) && role.equals(usuarioVO.role);
     }
 
     @Override
@@ -104,6 +119,7 @@ public class UsuarioVO implements UserDetails {
         result = 31 * result + senha.hashCode();
         result = 31 * result + celular.hashCode();
         result = 31 * result + cpf.hashCode();
+        result = 31 * result + role.hashCode();
         return result;
     }
 
@@ -128,6 +144,7 @@ public class UsuarioVO implements UserDetails {
                 ", senha='" + senha + '\'' +
                 ", celular='" + celular + '\'' +
                 ", cpf='" + cpf + '\'' +
+                ", role='" + role + '\'' +
                 '}';
     }
 

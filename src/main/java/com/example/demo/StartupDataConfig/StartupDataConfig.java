@@ -1,5 +1,6 @@
 package com.example.demo.StartupDataConfig;
 
+import com.example.demo.Enum.UserRole;
 import com.example.demo.Usuario.UsuarioRepository;
 import com.example.demo.Usuario.UsuarioVO;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,6 +23,7 @@ public class StartupDataConfig {
                 mUsuarioVO.setCelular("(48) 999965858");
                 mUsuarioVO.setEmail("ADM@GMAIL.COM");
                 mUsuarioVO.setSenha(fPasswordEncoder.encode("123"));
+                mUsuarioVO.setRole(UserRole.ADMIN);
                 mUsuarioRepository.save(mUsuarioVO);
             }
         };
