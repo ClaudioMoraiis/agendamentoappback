@@ -18,10 +18,15 @@ public class MensagemDTO {
     @NotNull(message = "Campo 'conteudo' não informado no body!")
     private String conteudo;
 
-    public MensagemDTO(Long clienteId, Long senderId, String conteudo) {
+    @JsonProperty("situacao")
+    private String situacao;
+
+    public MensagemDTO(Long clienteId, Long senderId, String conteudo, String situacao) {
         this.clienteId = clienteId;
         this.senderId = senderId;
         this.conteudo = conteudo;
+        this.situacao = situacao;
+        this.situacao = situacao;
     }
 
     public MensagemDTO(){}
@@ -50,11 +55,19 @@ public class MensagemDTO {
         this.conteudo = conteudo;
     }
 
+    public String getSituacao() {
+        return situacao;
+    }
+
+    public void setSituacao(String situacao) {
+        this.situacao = situacao;
+    }
+
     @Override
     public final boolean equals(Object o) {
         if (!(o instanceof MensagemDTO that)) return false;
 
-        return Objects.equals(clienteId, that.clienteId) && Objects.equals(senderId, that.senderId) && Objects.equals(conteudo, that.conteudo);
+        return Objects.equals(clienteId, that.clienteId) && Objects.equals(senderId, that.senderId) && Objects.equals(conteudo, that.conteudo) && Objects.equals(situacao, that.situacao);
     }
 
     @Override
@@ -62,6 +75,7 @@ public class MensagemDTO {
         int result = Objects.hashCode(clienteId);
         result = 31 * result + Objects.hashCode(senderId);
         result = 31 * result + Objects.hashCode(conteudo);
+        result = 31 * result + Objects.hashCode(situacao);
         return result;
     }
 
@@ -70,6 +84,7 @@ public class MensagemDTO {
         return "MensagemDTO{" +
                 "clienteId=" + clienteId +
                 ", senderId=" + senderId +
+                ", situacao=" + situacao +
                 ", conteudo='" + conteudo + '\'' +
                 '}';
     }

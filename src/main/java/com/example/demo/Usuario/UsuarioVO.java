@@ -1,5 +1,6 @@
 package com.example.demo.Usuario;
 
+import com.example.demo.Enum.SituacaoOnline;
 import com.example.demo.Enum.UserRole;
 import jakarta.persistence.*;
 import org.springframework.security.core.GrantedAuthority;
@@ -35,7 +36,11 @@ public class UsuarioVO implements UserDetails {
     @Enumerated(EnumType.STRING)
     private UserRole role;
 
-    public UsuarioVO(Long id, String nome, String email, String senha, String celular, String cpf, UserRole role) {
+    @Column(name = "usu_online")
+    @Enumerated(EnumType.STRING)
+    private SituacaoOnline online;
+
+    public UsuarioVO(Long id, String nome, String email, String senha, String celular, String cpf, UserRole role, SituacaoOnline online) {
         this.id = id;
         this.nome = nome;
         this.email = email;
@@ -43,6 +48,7 @@ public class UsuarioVO implements UserDetails {
         this.celular = celular;
         this.cpf = cpf;
         this.role = role;
+        this.online = online;
     }
 
     public UsuarioVO(){};
@@ -103,12 +109,21 @@ public class UsuarioVO implements UserDetails {
         this.role = role;
     }
 
+    public SituacaoOnline getOnline() {
+        return online;
+    }
+
+    public void setOnline(SituacaoOnline online) {
+        this.online = online;
+    }
+
     @Override
     public final boolean equals(Object o) {
         if (!(o instanceof UsuarioVO usuarioVO)) return false;
 
         return id.equals(usuarioVO.id) && nome.equals(usuarioVO.nome) && email.equals(usuarioVO.email) &&
-                senha.equals(usuarioVO.senha) && celular.equals(usuarioVO.celular) && cpf.equals(usuarioVO.cpf) && role.equals(usuarioVO.role);
+                senha.equals(usuarioVO.senha) && celular.equals(usuarioVO.celular) && cpf.equals(usuarioVO.cpf) &&
+                role.equals(usuarioVO.role) && online.equals(usuarioVO.online);
     }
 
     @Override
@@ -120,6 +135,7 @@ public class UsuarioVO implements UserDetails {
         result = 31 * result + celular.hashCode();
         result = 31 * result + cpf.hashCode();
         result = 31 * result + role.hashCode();
+        result = 31 * result + online.hashCode();
         return result;
     }
 
@@ -144,6 +160,7 @@ public class UsuarioVO implements UserDetails {
                 ", senha='" + senha + '\'' +
                 ", celular='" + celular + '\'' +
                 ", cpf='" + cpf + '\'' +
+                ", online='" + online + '\'' +
                 ", role='" + role + '\'' +
                 '}';
     }

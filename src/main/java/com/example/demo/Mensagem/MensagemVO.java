@@ -36,6 +36,9 @@ public class MensagemVO {
     @Column(name = "men_dthr")
     private LocalDateTime createdAt;
 
+    private boolean deletedBySender = false;
+    private boolean deletedByRecipient = false;
+
     public MensagemVO(Long id, UsuarioVO sender, UsuarioVO client, String conteudo, MessageStatusEnum status, LocalDateTime createdAt) {
         this.id = id;
         this.sender = sender;
@@ -95,6 +98,22 @@ public class MensagemVO {
         this.createdAt = createdAt;
     }
 
+    public boolean isDeletedBySender() {
+        return deletedBySender;
+    }
+
+    public void setDeletedBySender(boolean deletedBySender) {
+        this.deletedBySender = deletedBySender;
+    }
+
+    public boolean isDeletedByRecipient() {
+        return deletedByRecipient;
+    }
+
+    public void setDeletedByRecipient(boolean deletedByRecipient) {
+        this.deletedByRecipient = deletedByRecipient;
+    }
+
     @Override
     public String toString() {
         return "MensagemVO{" +
@@ -123,13 +142,5 @@ public class MensagemVO {
         result = 31 * result + Objects.hashCode(status);
         result = 31 * result + Objects.hashCode(createdAt);
         return result;
-    }
-
-    @PrePersist
-    @PreUpdate
-    public void toUpperCase(){
-        if (conteudo != null){
-            conteudo = conteudo.toUpperCase();
-        }
     }
 }

@@ -41,7 +41,8 @@ public class SecurityFilter extends OncePerRequestFilter {
                 path.startsWith("/webjars") ||
                 path.startsWith("/swagger-ui.html") ||
                 path.equals("/swagger-ui/index.html") ||
-                path.equals("/swagger-ui/")) {
+                path.equals("/swagger-ui/") ||
+                path.startsWith("/ws-chat/")) {
             filterChain.doFilter(request, response);
             return;
         }

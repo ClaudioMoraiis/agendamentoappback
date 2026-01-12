@@ -1,5 +1,6 @@
 package com.example.demo.Usuario;
 
+import com.example.demo.Enum.SituacaoOnline;
 import com.example.demo.Enum.UserRole;
 import com.example.demo.Jwt.TokenService;
 import com.example.demo.UsuarioToken.UsuarioTokenRepository;
@@ -125,6 +126,9 @@ public class UsuarioService {
             var mAuth = fAuthenticationManager.authenticate(mAuthToken);
 
             var mToken = fTokenService.generateToken((UsuarioVO) mAuth.getPrincipal());
+
+            mVO.setOnline(SituacaoOnline.TRUE);
+            fRepository.save(mVO);
             return ResponseEntity.status(HttpStatus.OK).body(
                     ApiResponseUtil.response("Sucesso", "Login realizado com sucesso\n" + "Token: " + mToken + " ID :" + mVO.getId()));
         } catch (Exception e) {
@@ -228,4 +232,34 @@ public class UsuarioService {
                 ApiResponseUtil.response("Sucesso", mUserVO.getId().toString()));
     }
 
+    public ResponseEntity<?> getRole(Long mId){
+        Optional<UsuarioVO> mUsuarioVO = fRepository.findById(mId);
+        if (mUsuarioVO.isEmpty()){
+            return null;
+        };
+
+        return ResponseEntity.status(HttpStatus.OK).body(
+                ApiResponseUtil.response("Sucesso", mUsuarioVO.get().getRole().toString())
+        );
+    }
+
+    public ResponseEntity<?> isOnline(Long mId, Boolean mIsOnline){
+        Optional<UsuarioVO> mUsuarioVO = fRepository.findById(mId);
+        if (mUsuarioVO.isEmpty()){
+            return ResponseEntity.status(HttpStatus.OK).body(
+                    ApiResponseUtil.response("Erro", "Nenhum usuário localizado com esse ID!")
+            );
+        }
+
+        SituacaoOnline mSituacao = mIsOnline ? SituacaoOnline.TRUE : SituacaoOnline.FALSE;
+        mUsuarioVO.get().setOnline(mSituacao);
+        try {
+            fRepository.save(mUsuarioVO.get());
+            return ResponseEntity.status(HttpStatus.OK).body(
+                    ApiResponseUtil.response("Sucesso", "Usuário alterado com sucesso"));
+        }catch (Exception e){
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
+                    ApiResponseUtil.response("Erro", e.getMessage()));
+        }
+    }
 }

@@ -66,4 +66,14 @@ public class UsuarioRota {
         return fService.getIdByName(name);
     }
 
+    @GetMapping("/role/{id}")
+    public ResponseEntity<?> role(@PathVariable Long id){
+        return fService.getRole(id);
+    }
+
+    @PatchMapping("/online/{id}")
+    private ResponseEntity<?> online(@PathVariable Long id, @RequestParam Boolean mOnline){
+        return fService.isOnline(id, mOnline);
+    }
+
 }
