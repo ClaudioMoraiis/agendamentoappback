@@ -222,38 +222,45 @@ public class AgendamentoService {
     }
 
     public ResponseEntity<?> getAvailableTimeProfissional(Long mProfissionalId, Long mServicoId, LocalDate mData) {
-        String mDayOfWeek = convertDayForPortuguese(mData.getDayOfWeek().toString().toUpperCase());
-        ProfissionalHorarioVO mProfissionalHorarioVO =
-                fProfissionalHorarioRepository.findByProfissionalVO_IdAndDiaSemanaContaining(
+        String mDayOfWeek = convertDayForPortuguese(mData.getDayOfWeek().toString().toUpperCase()).toUpperCase();
+        List<ProfissionalHorarioVO> faixasHorario =
+                fProfissionalHorarioRepository.findAllByProfissionalVO_IdAndDiaSemanaContaining(
                         mProfissionalId, mDayOfWeek);
 
-        if (mProfissionalHorarioVO == null) {
+        if (faixasHorario == null || faixasHorario.isEmpty()) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(
                     ApiResponseUtil.response("Erro", "Nenhum horário disponível para esse profissional")
             );
         }
 
+        Optional<ServicoVO> mServicoVO = fServicoRepository.findById(mServicoId);
+        if (mServicoVO.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(
+                    ApiResponseUtil.response("Erro", "Serviço não localizado")
+            );
+        }
+        Long mDuracaoServico = mServicoVO.get().getDuracao();
+
         List<AgendamentoVO> mAgendamentos = fRepository
                 .findByProfissionalVO_IdAndDataAndStatusIn(
                         mProfissionalId,
                         mData,
-                        List.of(EnumAgendamentoStatus.CONCLUIDO, EnumAgendamentoStatus.CONFIRMADO)
+                        List.of(EnumAgendamentoStatus.CONCLUIDO, EnumAgendamentoStatus.CONFIRMADO, EnumAgendamentoStatus.PENDENTE)
                 );
 
-        Optional<ServicoVO> mServicoVO = fServicoRepository.findById(mServicoId);
-        Long mDuracaoServico = mServicoVO.get().getDuracao();
-
-        LocalTime mHorainicio = mProfissionalHorarioVO.getHoraInicial();
-        LocalTime mHorafim = mProfissionalHorarioVO.getHoraFinal();
-        LocalTime mHoraAtual = mHorainicio;
         List<LocalTime> mHorariosPossiveis = new ArrayList<>();
-
-        while (mHoraAtual.isBefore(mHorafim)) {
-            mHorariosPossiveis.add(mHoraAtual);
-            mHoraAtual = mHoraAtual.plusMinutes(mDuracaoServico);
+        for (ProfissionalHorarioVO faixa : faixasHorario) {
+            LocalTime mHoraAtual = faixa.getHoraInicial();
+            LocalTime mHorafim = faixa.getHoraFinal();
+            while (mHoraAtual.plusMinutes(mDuracaoServico).compareTo(mHorafim) <= 0) {
+                mHorariosPossiveis.add(mHoraAtual);
+                mHoraAtual = mHoraAtual.plusMinutes(mDuracaoServico);
+            }
         }
 
         List<LocalTime> mHorariosLivres = mHorariosPossiveis.stream()
+                .distinct()
+                .sorted()
                 .filter(horario -> mAgendamentos.stream().noneMatch(a -> {
                     LocalTime inicio = a.getHorarioIncio();
                     LocalTime fim = a.getHorarioFim();

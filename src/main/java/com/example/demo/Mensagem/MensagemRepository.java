@@ -120,4 +120,12 @@ public interface MensagemRepository extends JpaRepository<MensagemVO, Long> {
             @Param("clienteId") Long clienteId,
             @Param("usuarioId") Long usuarioId
     );
+
+    @Query("""
+            SELECT COUNT(m) FROM MensagemVO m
+            WHERE m.client.id = :usuarioId
+              AND m.status <> com.example.demo.Enum.MessageStatusEnum.READ
+              AND m.deletedByRecipient = false
+            """)
+    long contarNaoLidasParaUsuario(@Param("usuarioId") Long usuarioId);
 }

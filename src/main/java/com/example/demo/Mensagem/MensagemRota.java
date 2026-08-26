@@ -45,4 +45,9 @@ public class MensagemRota {
     private ResponseEntity<?> deletar(@PathVariable Long idMensagem, @PathVariable Long usuarioId){
         return fService.deletar(idMensagem, usuarioId);
     }
+
+    @GetMapping("/nao-lidas/count")
+    private ResponseEntity<?> contarNaoLidas(@RequestParam Long usuarioId){
+        return fService.contarNaoLidas(usuarioId);
+    }
 }

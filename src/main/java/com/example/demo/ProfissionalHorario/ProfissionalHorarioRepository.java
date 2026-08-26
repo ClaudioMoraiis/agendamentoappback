@@ -20,6 +20,9 @@ public interface ProfissionalHorarioRepository extends JpaRepository<Profissiona
     );
 
     ProfissionalHorarioVO findByProfissionalVO_IdAndDiaSemanaContaining(Long mProfissionalId, String mDayOfWeek);
+
+    List<ProfissionalHorarioVO> findAllByProfissionalVO_IdAndDiaSemanaContaining(Long mProfissionalId, String mDayOfWeek);
+
     List<ProfissionalHorarioVO> findByProfissionalVO_id(Long mId);
 
     @Query(

@@ -39,11 +39,11 @@ public class MensagemService {
 
         if (mUsuarioSenderVO.isEmpty()) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(
-                    ApiResponseUtil.response("Erro", "Cliente destino não localizado com esse id")
+                    ApiResponseUtil.response("Erro", "Remetente não localizado com esse id")
             );
         } else if (mUsuarioDestinoVO.isEmpty()) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(
-                    ApiResponseUtil.response("Erro", "Cliente não localizado com esse id")
+                    ApiResponseUtil.response("Erro", "Destinatário não localizado com esse id")
             );
         }
 
@@ -257,6 +257,16 @@ public class MensagemService {
         return ResponseEntity.ok(
                 ApiResponseUtil.response("Sucesso", "Mensagem apagada para todos")
         );
+    }
+
+    public ResponseEntity<?> contarNaoLidas(Long usuarioId) {
+        if (usuarioId == null || !fUsuarioRepository.existsById(usuarioId)) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
+                    ApiResponseUtil.response("Erro", "Usuário não informado ou inválido")
+            );
+        }
+        long total = fRepository.contarNaoLidasParaUsuario(usuarioId);
+        return ResponseEntity.ok(Map.of("total", total));
     }
 
 }

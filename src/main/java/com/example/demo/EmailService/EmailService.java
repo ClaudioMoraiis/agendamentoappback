@@ -8,13 +8,17 @@ import com.example.demo.Util.ApiResponseUtil;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
 import java.util.Map;
 import java.util.Optional;
@@ -34,10 +38,18 @@ public class EmailService {
     @Autowired
     private final JavaMailSender fMailSender;
 
+    @Value("${app.frontend.reset-url:https://agendamento-app-mocha.vercel.app}")
+    private String frontendResetUrl;
+
+    @Value("${spring.mail.from:${spring.mail.username:}}")
+    private String mailFrom;
+
+    @Value("${app.mail.expose-error:false}")
+    private boolean exposeError;
+
     public EmailService(JavaMailSender fMailSender) {
         this.fMailSender = fMailSender;
     }
-
 
     public ResponseEntity<?> enviarEmailRecuperacaoSenha(String mPara) throws MessagingException {
         Optional<UsuarioVO> mUsuarioVO = Optional.ofNullable(fRepository.findByEmail(mPara));
@@ -56,14 +68,16 @@ public class EmailService {
             fUsuarioTokenRepository.save(mUsuarioTokenVO);
 
             String token = mUsuarioTokenVO.getUto_token();
-
-            String link = "http://localhost:5173/recuperar-senha?token=" + token;
+            String link = buildResetUrl(token);
             String assunto = "Recuperação senha";
             String conteudo = "<p>Clique no link abaixo para redefinir sua senha:</p>" + "<p><a href=\"" + link
                     + "\">Redefinir Senha</a></p>";
 
             MimeMessage mMensagem = fMailSender.createMimeMessage();
             MimeMessageHelper helper = new MimeMessageHelper(mMensagem, true);
+            if (StringUtils.hasText(mailFrom)) {
+                helper.setFrom(mailFrom.trim());
+            }
             helper.setTo(mPara);
             helper.setSubject(assunto);
             helper.setText(conteudo, true);
@@ -73,9 +87,20 @@ public class EmailService {
             return ResponseEntity.ok("E-mail enviado");
         } catch (Exception e) {
             e.printStackTrace();
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body("Erro ao processar solicitação: " + e.getMessage());
+            String msg = "Erro ao processar solicitação";
+            if (exposeError && e.getMessage() != null) {
+                msg = msg + ": " + e.getMessage();
+            }
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(msg);
         }
+    }
+
+    private String buildResetUrl(String token) {
+        if (!StringUtils.hasText(frontendResetUrl)) {
+            throw new IllegalStateException("app.frontend.reset-url nao configurada");
+        }
+        String normalized = frontendResetUrl.trim().replaceAll("/+$", "");
+        return normalized + "/recuperar-senha?token=" + URLEncoder.encode(token, StandardCharsets.UTF_8);
     }
 
     public ResponseEntity<?> redefinirSenha(Map<String, String> request) {

@@ -168,6 +168,8 @@ public class UsuarioService {
                     map.put("celular", mVO.getCelular());
                     map.put("cpf", mVO.getCpf());
                     map.put("id", mVO.getId());
+                    map.put("role", mVO.getRole() != null ? mVO.getRole().name() : null);
+                    map.put("tipo", mVO.getRole() != null ? mVO.getRole().name() : null);
                     return map;
                 })
                 .toList();
