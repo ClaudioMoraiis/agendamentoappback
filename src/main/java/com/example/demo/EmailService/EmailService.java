@@ -38,7 +38,7 @@ public class EmailService {
     @Autowired
     private final JavaMailSender fMailSender;
 
-    @Value("${app.frontend.reset-url:https://agendamento-app-mocha.vercel.app}")
+    @Value("${app.frontend.reset-url:https://agendamento.claudiomoraisdev.com.br}")
     private String frontendResetUrl;
 
     @Value("${spring.mail.from:${spring.mail.username:}}")

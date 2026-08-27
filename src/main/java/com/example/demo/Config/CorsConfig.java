@@ -29,6 +29,7 @@ public class CorsConfig {
         origins.add("http://localhost:8080");
         origins.add("http://192.168.18.22:5173");
         origins.add("https://agendamento-app-mocha.vercel.app");
+        origins.add("https://agendamento.claudiomoraisdev.com.br");
         origins.add("https://www.claudiomoraisdev.com.br");
         origins.add("https://claudiomoraisdev.com.br");
 

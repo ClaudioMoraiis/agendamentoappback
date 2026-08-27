@@ -2,7 +2,7 @@
 
 API REST de agendamento para barbearia/salão. Java + Spring Boot.
 
-**Front:** https://agendamento-app-mocha.vercel.app  
+**Front:** https://agendamento.claudiomoraisdev.com.br  
 **API (prod):** https://api-agendamento.claudiomoraisdev.com.br
 
 ## Stack
